@@ -238,7 +238,7 @@ export default function MedicineSearchMain({ initialQuery = '' } = {}) {
         }
         return 0;
       });
-  }, [selectedMedicine, radiusKm, quickFilters, dosageFormFilter, rxFilter, sortBy]);
+  }, [activePharmacies, selectedMedicine, radiusKm, quickFilters, dosageFormFilter, rxFilter, sortBy]);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 space-y-6">

@@ -11,6 +11,7 @@ import {
   Sparkles, 
   CheckCircle2, 
   Snowflake, 
+  User,
   Users, 
   ShieldCheck, 
   Truck, 

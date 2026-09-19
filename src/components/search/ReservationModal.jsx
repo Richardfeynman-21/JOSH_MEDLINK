@@ -81,7 +81,7 @@ export default function ReservationModal({
   };
 
   const copyCode = () => {
-    navigator.clipboard.writeText(reservationCode);
+    navigator?.clipboard?.writeText?.(reservationCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

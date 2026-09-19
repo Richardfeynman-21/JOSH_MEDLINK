@@ -6,6 +6,7 @@ import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { EmergencyBanner } from './components/common/EmergencyBanner';
 import { ToastContainer } from './components/common/ToastContainer';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 // Landing & Search Components
 import { LandingPage } from './components/landing/LandingPage';
@@ -313,8 +314,12 @@ function MainApp() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <MainApp />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <ErrorBoundary>
+          <MainApp />
+        </ErrorBoundary>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

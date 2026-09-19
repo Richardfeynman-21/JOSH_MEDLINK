@@ -13,6 +13,44 @@ import {
 
 const AuthContext = createContext(null);
 
+// In-memory fallback for environments where localStorage is restricted, unavailable, or SSR
+const memoryStore = new Map();
+
+export const safeStorage = {
+  get: (key) => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const item = window.localStorage.getItem(key);
+        if (item !== null) return item;
+      }
+    } catch {
+      // Fallback silently on SecurityError or sandbox restrictions
+    }
+    return memoryStore.has(key) ? memoryStore.get(key) : null;
+  },
+  set: (key, value) => {
+    const stringValue = String(value);
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, stringValue);
+      }
+    } catch {
+      // Fallback silently to memory
+    }
+    memoryStore.set(key, stringValue);
+  },
+  remove: (key) => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.removeItem(key);
+      }
+    } catch {
+      // Fallback silently to memory
+    }
+    memoryStore.delete(key);
+  }
+};
+
 const STORAGE_KEY_USER = 'medlink_auth_user';
 const STORAGE_KEY_ROLE = 'medlink_auth_role';
 const REMEMBER_KEY = 'medlink_remember_device';
@@ -26,18 +64,18 @@ const AUDIT_STORAGE_KEY = 'medlink_audit_logs';
 export const AuthProvider = ({ children }) => {
   // Remember workstation / device
   const [rememberDevice, setRememberDevice] = useState(() => {
-    return localStorage.getItem(REMEMBER_KEY) === 'true';
+    return safeStorage.get(REMEMBER_KEY) === 'true';
   });
 
   // Current Role: 'patient' | 'pharmacy' | 'admin' | null
   const [role, setRole] = useState(() => {
-    return localStorage.getItem(STORAGE_KEY_ROLE) || 'patient';
+    return safeStorage.get(STORAGE_KEY_ROLE) || 'patient';
   });
 
   // Current authenticated user (Patient, Pharmacy User, or Admin)
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem(STORAGE_KEY_USER);
-    const savedRole = localStorage.getItem(STORAGE_KEY_ROLE);
+    const savedUser = safeStorage.get(STORAGE_KEY_USER);
+    const savedRole = safeStorage.get(STORAGE_KEY_ROLE);
     if (savedUser && savedRole) {
       try {
         return JSON.parse(savedUser);
@@ -49,7 +87,7 @@ export const AuthProvider = ({ children }) => {
 
   // Master Synchronized Medicines State (changes here instantly reflect in Search and Admin)
   const [medicines, setMedicines] = useState(() => {
-    const saved = localStorage.getItem(MEDS_STORAGE_KEY);
+    const saved = safeStorage.get(MEDS_STORAGE_KEY);
     if (saved) {
       try { return JSON.parse(saved); } catch {}
     }
@@ -63,7 +101,7 @@ export const AuthProvider = ({ children }) => {
 
   // Pending Pharmacies Queue (for Admin licensing approvals)
   const [pendingPharmacies, setPendingPharmacies] = useState(() => {
-    const saved = localStorage.getItem(PENDING_PHARMA_KEY);
+    const saved = safeStorage.get(PENDING_PHARMA_KEY);
     if (saved) {
       try { return JSON.parse(saved); } catch {}
     }
@@ -72,7 +110,7 @@ export const AuthProvider = ({ children }) => {
 
   // Live 2-Hour Shelf Reservations Queue
   const [reservations, setReservations] = useState(() => {
-    const saved = localStorage.getItem(RES_STORAGE_KEY);
+    const saved = safeStorage.get(RES_STORAGE_KEY);
     if (saved) {
       try { return JSON.parse(saved); } catch {}
     }
@@ -87,7 +125,7 @@ export const AuthProvider = ({ children }) => {
 
   // Audit Logs Telemetry
   const [auditLogs, setAuditLogs] = useState(() => {
-    const saved = localStorage.getItem(AUDIT_STORAGE_KEY);
+    const saved = safeStorage.get(AUDIT_STORAGE_KEY);
     if (saved) {
       try { return JSON.parse(saved); } catch {}
     }
@@ -96,7 +134,7 @@ export const AuthProvider = ({ children }) => {
 
   // Patient Profile state (pharmacies and prescriptions for patient dashboard)
   const [pharmacies, setPharmacies] = useState(() => {
-    const saved = localStorage.getItem(PHARMA_STORAGE_KEY);
+    const saved = safeStorage.get(PHARMA_STORAGE_KEY);
     if (saved) {
       try { return JSON.parse(saved); } catch {}
     }
@@ -104,7 +142,7 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [prescriptions, setPrescriptions] = useState(() => {
-    const saved = localStorage.getItem(RX_STORAGE_KEY);
+    const saved = safeStorage.get(RX_STORAGE_KEY);
     if (saved) {
       try { return JSON.parse(saved); } catch {}
     }
@@ -128,40 +166,40 @@ export const AuthProvider = ({ children }) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  // Sync to local storage
+  // Sync to local storage safely
   useEffect(() => {
     if (user && rememberDevice) {
-      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
-      localStorage.setItem(STORAGE_KEY_ROLE, role);
-      localStorage.setItem(REMEMBER_KEY, 'true');
+      safeStorage.set(STORAGE_KEY_USER, JSON.stringify(user));
+      safeStorage.set(STORAGE_KEY_ROLE, role);
+      safeStorage.set(REMEMBER_KEY, 'true');
     } else if (!user) {
-      localStorage.removeItem(STORAGE_KEY_USER);
-      localStorage.removeItem(STORAGE_KEY_ROLE);
+      safeStorage.remove(STORAGE_KEY_USER);
+      safeStorage.remove(STORAGE_KEY_ROLE);
     }
   }, [user, role, rememberDevice]);
 
   useEffect(() => {
-    localStorage.setItem(MEDS_STORAGE_KEY, JSON.stringify(medicines));
+    safeStorage.set(MEDS_STORAGE_KEY, JSON.stringify(medicines));
   }, [medicines]);
 
   useEffect(() => {
-    localStorage.setItem(RES_STORAGE_KEY, JSON.stringify(reservations));
+    safeStorage.set(RES_STORAGE_KEY, JSON.stringify(reservations));
   }, [reservations]);
 
   useEffect(() => {
-    localStorage.setItem(PENDING_PHARMA_KEY, JSON.stringify(pendingPharmacies));
+    safeStorage.set(PENDING_PHARMA_KEY, JSON.stringify(pendingPharmacies));
   }, [pendingPharmacies]);
 
   useEffect(() => {
-    localStorage.setItem(AUDIT_STORAGE_KEY, JSON.stringify(auditLogs));
+    safeStorage.set(AUDIT_STORAGE_KEY, JSON.stringify(auditLogs));
   }, [auditLogs]);
 
   useEffect(() => {
-    localStorage.setItem(RX_STORAGE_KEY, JSON.stringify(prescriptions));
+    safeStorage.set(RX_STORAGE_KEY, JSON.stringify(prescriptions));
   }, [prescriptions]);
 
   useEffect(() => {
-    localStorage.setItem(PHARMA_STORAGE_KEY, JSON.stringify(pharmacies));
+    safeStorage.set(PHARMA_STORAGE_KEY, JSON.stringify(pharmacies));
   }, [pharmacies]);
 
   // Append Audit Log Helper
@@ -349,8 +387,8 @@ export const AuthProvider = ({ children }) => {
     logAuditEvent('User Session Terminated', `Role ${role} logged out`, 'AUTH');
     setUser(null);
     setRole(null);
-    localStorage.removeItem(STORAGE_KEY_USER);
-    localStorage.removeItem(STORAGE_KEY_ROLE);
+    safeStorage.remove(STORAGE_KEY_USER);
+    safeStorage.remove(STORAGE_KEY_ROLE);
     showToast('You have logged out securely.', 'info', 'Session Ended');
   };
 
