@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   MOCK_MEDICINES,
   MOCK_PHARMACIES,
   RECENT_SEARCHES_DEFAULT,
 } from '../../data/mockMedicines';
+import { useAuth } from '../../context/AuthContext';
 import SearchModeSelector from './SearchModeSelector';
 import PredictiveSearchBar from './PredictiveSearchBar';
 import SearchFiltersBar from './SearchFiltersBar';
@@ -19,14 +20,45 @@ import {
   ArrowUpDown,
 } from 'lucide-react';
 
-export default function MedicineSearchMain() {
+export default function MedicineSearchMain({ initialQuery = '' } = {}) {
+  const { medicines, allPharmacies } = useAuth();
+  const activeMedicines = medicines || MOCK_MEDICINES;
+  const activePharmacies = allPharmacies || MOCK_PHARMACIES;
+
   // Search Mode state: 'brand' | 'generic' | 'med_id' | 'category'
   const [activeMode, setActiveMode] = useState('brand');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Selected Medicine state (defaults to first medicine Lipitor 20mg)
-  const [selectedMedicine, setSelectedMedicine] = useState(MOCK_MEDICINES[0]);
+  // Selected Medicine state (defaults to first medicine Lipitor 20mg or matching initialQuery)
+  const [selectedMedicineId, setSelectedMedicineId] = useState(() => {
+    if (initialQuery) {
+      const match = activeMedicines.find(m =>
+        m.brandName.toLowerCase().includes(initialQuery.toLowerCase()) ||
+        m.genericName.toLowerCase().includes(initialQuery.toLowerCase())
+      );
+      if (match) return match.id;
+    }
+    return activeMedicines[0]?.id || 'med-lipitor-20';
+  });
+
+  // Always compute fresh live medicine from reactive medicines state
+  const liveSelectedMedicine = useMemo(() => {
+    return activeMedicines.find((m) => m.id === selectedMedicineId) || activeMedicines[0];
+  }, [activeMedicines, selectedMedicineId]);
+
+  const selectedMedicine = liveSelectedMedicine;
+
+  useEffect(() => {
+    if (initialQuery) {
+      setSearchQuery(initialQuery);
+      const match = activeMedicines.find(m =>
+        m.brandName.toLowerCase().includes(initialQuery.toLowerCase()) ||
+        m.genericName.toLowerCase().includes(initialQuery.toLowerCase())
+      );
+      if (match) setSelectedMedicineId(match.id);
+    }
+  }, [initialQuery, activeMedicines]);
 
   // Spatial & Filtering state
   const [pincode, setPincode] = useState('560034');
@@ -79,14 +111,14 @@ export default function MedicineSearchMain() {
   const handleSelectCategory = (catId) => {
     setSelectedCategory(catId);
     if (catId !== 'all') {
-      const match = MOCK_MEDICINES.find((m) => m.category === catId);
-      if (match) setSelectedMedicine(match);
+      const match = activeMedicines.find((m) => m.category === catId);
+      if (match) setSelectedMedicineId(match.id);
     }
   };
 
   // Handle selecting a medicine from search suggestions
   const handleSelectMedicine = (med) => {
-    setSelectedMedicine(med);
+    setSelectedMedicineId(med.id);
     // Add to recent searches if not already there
     if (!recentSearches.includes(med.brandName)) {
       setRecentSearches([med.brandName, ...recentSearches.slice(0, 4)]);
@@ -143,9 +175,9 @@ export default function MedicineSearchMain() {
   const filteredPharmacies = useMemo(() => {
     if (!selectedMedicine) return [];
 
-    return MOCK_PHARMACIES.map((pharmacy) => {
+    return activePharmacies.map((pharmacy) => {
       // Find inventory entry for selected medicine in this pharmacy
-      const inventoryEntry = selectedMedicine.pharmacyInventory.find(
+      const inventoryEntry = selectedMedicine.pharmacyInventory?.find(
         (inv) => inv.pharmacyId === pharmacy.id
       );
 
@@ -242,7 +274,7 @@ export default function MedicineSearchMain() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           activeMode={activeMode}
-          allMedicines={MOCK_MEDICINES}
+          allMedicines={activeMedicines}
           onSelectMedicine={handleSelectMedicine}
           recentSearches={recentSearches}
           onClearRecentSearches={() => setRecentSearches([])}

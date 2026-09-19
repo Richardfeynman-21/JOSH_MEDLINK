@@ -12,14 +12,8 @@ import {
   Building2, 
   User, 
   LogOut, 
-  AlertCircle, 
-  PhoneCall, 
   Activity, 
-  BellRing,
-  Sparkles,
-  QrCode,
-  CheckCircle2,
-  Lock
+  QrCode
 } from 'lucide-react';
 
 export const PatientDashboard = ({ onOpenAuthModal }) => {
@@ -47,8 +41,8 @@ export const PatientDashboard = ({ onOpenAuthModal }) => {
     );
   }
 
-  const inTransitCount = prescriptions.filter((p) => p.status === 'In Transit').length;
-  const refillNeededCount = prescriptions.filter((p) => p.status === 'Refill Needed').length;
+  const inTransitCount = (prescriptions || []).filter((p) => p.status === 'In Transit').length;
+  const refillNeededCount = (prescriptions || []).filter((p) => p.status === 'Refill Needed').length;
 
   const handleSimulateEmergency = () => {
     setShowEmergencyBadgeModal(true);
@@ -69,18 +63,18 @@ export const PatientDashboard = ({ onOpenAuthModal }) => {
                 <span>Verified Patient Portal</span>
               </span>
               <span className="font-mono text-xs bg-white/10 px-2.5 py-1 rounded-full text-slate-200 border border-white/10">
-                {user.id.startsWith('#') ? user.id : `#${user.id}`}
+                {user.id ? (user.id.startsWith('#') ? user.id : `#${user.id}`) : '#ML-PATIENT'}
               </span>
               <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-300 bg-rose-500/20 px-2.5 py-1 rounded-full border border-rose-400/30">
-                Blood: {user.bloodGroup}
+                Blood: {user.bloodGroup || 'O-'}
               </span>
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-              Welcome, {user.fullName}
+              Welcome, {user.fullName || 'Patient'}
             </h1>
             <p className="text-xs sm:text-sm text-teal-100/80 max-w-xl">
-              Connected to <strong>{pharmacies.find(p => p.isPrimary)?.name || 'Local 24/7 Pharmacy'}</strong> • {user.location?.city || 'Metro City'} zone ({user.location?.pincode || '94107'})
+              Connected to <strong>{(pharmacies || []).find(p => p.isPrimary)?.name || 'Local 24/7 Pharmacy'}</strong> • {user.location?.city || 'Metro City'} zone ({user.location?.pincode || '94107'})
             </p>
           </div>
 
@@ -113,7 +107,7 @@ export const PatientDashboard = ({ onOpenAuthModal }) => {
 
           <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
             <span className="text-[10px] uppercase font-bold text-teal-300 block">Prescriptions</span>
-            <p className="text-lg font-black text-white mt-0.5">{prescriptions.length} Active</p>
+            <p className="text-lg font-black text-white mt-0.5">{(prescriptions || []).length} Active</p>
           </div>
 
           <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
@@ -137,7 +131,7 @@ export const PatientDashboard = ({ onOpenAuthModal }) => {
         {[
           { id: 'overview', label: 'Emergency ID & Overview', icon: Activity },
           { id: 'prescriptions', label: 'Prescriptions & Refills', count: refillNeededCount, icon: Pill },
-          { id: 'pharmacies', label: 'Linked Pharmacies (24/7)', count: pharmacies.length, icon: Building2 },
+          { id: 'pharmacies', label: 'Linked Pharmacies (24/7)', count: (pharmacies || []).length, icon: Building2 },
           { id: 'demographics', label: 'Contact & Residential Pincode', icon: User },
         ].map((tab) => {
           const Icon = tab.icon;

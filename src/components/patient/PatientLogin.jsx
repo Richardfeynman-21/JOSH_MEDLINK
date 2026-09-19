@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { DEMO_PATIENT } from '../../data/mockPatientData';
 
-export const Login = ({ onSwitchToRegister, onSwitchToForgot, onSuccess }) => {
+export const PatientLogin = ({ onSwitchToRegister, onSwitchToForgot, onSuccess }) => {
   const { login, loginDemoPatient, rememberDevice, setRememberDevice } = useAuth();
 
   const [identifier, setIdentifier] = useState('');
@@ -97,7 +97,7 @@ export const Login = ({ onSwitchToRegister, onSwitchToForgot, onSuccess }) => {
         <button
           type="button"
           onClick={handleDemoLogin}
-          className="mt-3 w-full inline-flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold rounded-lg bg-teal-700 hover:bg-teal-800 text-white transition-all shadow-sm active:scale-[0.99]"
+          className="mt-3 w-full inline-flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold rounded-lg bg-teal-700 hover:bg-teal-800 text-white transition-all shadow-sm active:scale-[0.99] cursor-pointer"
         >
           <Activity className="w-3.5 h-3.5" />
           <span>One-Click Demo Patient Login</span>
@@ -151,7 +151,7 @@ export const Login = ({ onSwitchToRegister, onSwitchToForgot, onSuccess }) => {
                 <button
                   type="button"
                   onClick={onSwitchToForgot}
-                  className="text-xs font-medium text-teal-600 hover:text-teal-700 hover:underline"
+                  className="text-xs font-medium text-teal-600 hover:text-teal-700 hover:underline cursor-pointer"
                 >
                   Forgot Password?
                 </button>
@@ -175,7 +175,7 @@ export const Login = ({ onSwitchToRegister, onSwitchToForgot, onSuccess }) => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600"
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
                 tabIndex={-1}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -227,7 +227,7 @@ export const Login = ({ onSwitchToRegister, onSwitchToForgot, onSuccess }) => {
             <button
               type="button"
               onClick={onSwitchToRegister}
-              className="font-semibold text-teal-600 hover:text-teal-700 hover:underline"
+              className="font-semibold text-teal-600 hover:text-teal-700 hover:underline cursor-pointer"
             >
               Start Clinical Intake
             </button>
@@ -237,3 +237,6 @@ export const Login = ({ onSwitchToRegister, onSwitchToForgot, onSuccess }) => {
     </div>
   );
 };
+
+// Also export as Login for alias compatibility
+export const Login = PatientLogin;

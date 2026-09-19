@@ -8,7 +8,6 @@ import {
   X, 
   PhoneCall, 
   Building2, 
-  ShieldCheck, 
   CheckCircle2 
 } from 'lucide-react';
 import { COMMON_ALLERGIES, COMMON_CONDITIONS } from '../../data/mockPatientData';

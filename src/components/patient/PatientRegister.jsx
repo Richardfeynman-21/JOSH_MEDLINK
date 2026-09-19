@@ -13,14 +13,12 @@ import {
   ArrowLeft, 
   Check, 
   Plus, 
-  X, 
-  FileText,
-  Hospital,
-  AlertCircle
+  Hospital, 
+  AlertCircle 
 } from 'lucide-react';
 import { BLOOD_GROUPS, COMMON_ALLERGIES, COMMON_CONDITIONS } from '../../data/mockPatientData';
 
-export const Register = ({ onSwitchToLogin, onSuccess }) => {
+export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
   const { register } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -219,7 +217,7 @@ export const Register = ({ onSwitchToLogin, onSuccess }) => {
           <button
             type="button"
             onClick={handlePrefillTemplate}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 px-3 py-1.5 rounded-full transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
           >
             <span>Pre-fill Sample Clinical Intake (Sarah Jenkins)</span>
           </button>
@@ -475,7 +473,7 @@ export const Register = ({ onSwitchToLogin, onSuccess }) => {
                   <button
                     type="button"
                     onClick={addCustomAllergy}
-                    className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors"
+                    className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add</span>
@@ -526,7 +524,7 @@ export const Register = ({ onSwitchToLogin, onSuccess }) => {
                   <button
                     type="button"
                     onClick={addCustomCondition}
-                    className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors"
+                    className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add</span>
@@ -631,7 +629,7 @@ export const Register = ({ onSwitchToLogin, onSuccess }) => {
                       errors.street ? 'border-rose-400' : 'border-slate-200'
                     }`}
                   />
-                  {errors.street && <p className="text-xs text-rose-500 mt-0.5">{errors.street}</p>}
+                  {errors.street && <p className="text-xs text-rose-500 mt-1">{errors.street}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -648,7 +646,7 @@ export const Register = ({ onSwitchToLogin, onSuccess }) => {
                         errors.pincode ? 'border-rose-400' : 'border-slate-200'
                       }`}
                     />
-                    {errors.pincode && <p className="text-xs text-rose-500 mt-0.5">{errors.pincode}</p>}
+                    {errors.pincode && <p className="text-xs text-rose-500 mt-1">{errors.pincode}</p>}
                   </div>
 
                   <div className="sm:col-span-1">
@@ -841,7 +839,7 @@ export const Register = ({ onSwitchToLogin, onSuccess }) => {
             <button
               type="button"
               onClick={onSwitchToLogin}
-              className="font-semibold text-teal-600 hover:text-teal-700 hover:underline"
+              className="font-semibold text-teal-600 hover:text-teal-700 hover:underline cursor-pointer"
             >
               Sign In to Patient Portal
             </button>
@@ -851,3 +849,6 @@ export const Register = ({ onSwitchToLogin, onSuccess }) => {
     </div>
   );
 };
+
+// Also export as Register for alias compatibility
+export const Register = PatientRegister;

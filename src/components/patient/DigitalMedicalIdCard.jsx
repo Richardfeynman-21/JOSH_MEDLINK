@@ -66,7 +66,7 @@ export const DigitalMedicalIdCard = () => {
         <rect x="46" y="84" width="8" height="8" rx="1.5" fill="#0f172a" />
         <rect x="62" y="84" width="8" height="8" rx="1.5" fill="#0d9488" />
         <rect x="46" y="98" width="8" height="8" rx="1.5" fill="#0f172a" />
-        <rect x="62" y="98" width="8" height="8" rx="1.5" fill="#0f172a" />
+        <rect x="62" y="98" width="8" height="8" rx="1.5" fill="#0d9488" />
         <rect x="84" y="84" width="8" height="8" rx="1.5" fill="#0f172a" />
         <rect x="98" y="98" width="8" height="8" rx="1.5" fill="#0d9488" />
       </svg>

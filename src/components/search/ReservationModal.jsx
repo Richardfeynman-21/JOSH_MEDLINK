@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import {
   X,
   ShieldCheck,
@@ -21,9 +22,10 @@ export default function ReservationModal({
   medicine,
   inventoryItem,
 }) {
+  const { user, createReservation } = useAuth();
   const [quantity, setQuantity] = useState(1);
-  const [patientName, setPatientName] = useState('Rahul Verma');
-  const [patientPhone, setPatientPhone] = useState('+91 98450 12345');
+  const [patientName, setPatientName] = useState(user?.fullName || 'Sarah Jenkins');
+  const [patientPhone, setPatientPhone] = useState(user?.phone || '+1 (555) 019-2834');
   const [hasUploadedRx, setHasUploadedRx] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [reservationCode, setReservationCode] = useState('');
@@ -34,11 +36,15 @@ export default function ReservationModal({
     if (isOpen) {
       setIsConfirmed(false);
       setQuantity(1);
+      if (user) {
+        setPatientName(user.fullName || 'Sarah Jenkins');
+        setPatientPhone(user.phone || '+1 (555) 019-2834');
+      }
       const code = `MED-RES-${Math.floor(1000 + Math.random() * 9000)}-2H`;
       setReservationCode(code);
       setTimeLeft(7200);
     }
-  }, [isOpen, pharmacy, medicine]);
+  }, [isOpen, pharmacy, medicine, user]);
 
   useEffect(() => {
     if (!isConfirmed) return;
@@ -61,6 +67,16 @@ export default function ReservationModal({
 
   const handleConfirmReservation = (e) => {
     e.preventDefault();
+    if (createReservation) {
+      const res = createReservation(pharmacy.id, medicine.id, quantity, {
+        patientName,
+        phone: patientPhone,
+        patientMedId: user?.id || '#ML-849201'
+      });
+      if (res?.token) {
+        setReservationCode(res.token);
+      }
+    }
     setIsConfirmed(true);
   };
 

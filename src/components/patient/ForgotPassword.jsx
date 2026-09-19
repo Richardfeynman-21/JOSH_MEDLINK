@@ -7,11 +7,11 @@ import {
   ArrowLeft, 
   ShieldCheck, 
   Lock, 
-  Check, 
   RotateCw, 
   Eye, 
   EyeOff, 
-  AlertCircle 
+  AlertCircle,
+  Check 
 } from 'lucide-react';
 
 export const ForgotPassword = ({ onSwitchToLogin }) => {
@@ -113,7 +113,6 @@ export const ForgotPassword = ({ onSwitchToLogin }) => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      // Accept demo code or any 6 digits for testing
       setStep(3);
       showToast('Verification successful! You can now choose a new clinical password.', 'success', 'Identity Confirmed');
     }, 450);
@@ -304,7 +303,7 @@ export const ForgotPassword = ({ onSwitchToLogin }) => {
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="px-3 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold flex items-center gap-1 transition-colors"
+                className="px-3 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Change Contact</span>
@@ -344,7 +343,7 @@ export const ForgotPassword = ({ onSwitchToLogin }) => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -428,7 +427,7 @@ export const ForgotPassword = ({ onSwitchToLogin }) => {
           <button
             type="button"
             onClick={onSwitchToLogin}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-800"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-slate-800 cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Return to Patient Login</span>

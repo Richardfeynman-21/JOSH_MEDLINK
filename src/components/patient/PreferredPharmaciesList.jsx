@@ -8,7 +8,6 @@ import {
   Phone, 
   Check, 
   ShieldCheck, 
-  Sparkles,
   ExternalLink
 } from 'lucide-react';
 
@@ -62,7 +61,7 @@ export const PreferredPharmaciesList = () => {
 
                     {pharmacy.isPrimary && (
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-teal-600 text-white text-[11px] font-bold shadow-xs">
-                        <Check className="w-3 h-3" />
+                        <Check className="w-3" />
                         <span>Primary Dispatch</span>
                       </span>
                     )}

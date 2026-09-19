@@ -7,11 +7,8 @@ import {
   Truck, 
   AlertCircle, 
   CheckCircle2, 
-  Calendar, 
-  UserCheck, 
   ShieldAlert, 
-  ArrowRight,
-  HelpCircle
+  ArrowRight
 } from 'lucide-react';
 
 export const PrescriptionRefillHistory = () => {
