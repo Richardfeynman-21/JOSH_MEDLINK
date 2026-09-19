@@ -10,7 +10,6 @@ import {
   LogOut, 
   ChevronDown, 
   Home, 
-  Search,
   Check
 } from 'lucide-react';
 
@@ -117,6 +116,7 @@ export const Navbar = ({ currentView, setCurrentView }) => {
           <div className="relative">
             <button
               onClick={() => setIsDemoDropdownOpen(!isDemoDropdownOpen)}
+              aria-label="Toggle Demo Switcher Menu"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 text-teal-800 border border-teal-200 text-xs font-bold transition-all shadow-xs cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5 text-teal-600" />
@@ -208,6 +208,7 @@ export const Navbar = ({ currentView, setCurrentView }) => {
                   else if (role === 'pharmacy') setCurrentView('pharmacy');
                   else if (role === 'admin') setCurrentView('admin');
                 }}
+                aria-label="View current user profile portal"
                 className="flex items-center gap-2 p-1.5 pr-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-colors text-left"
               >
                 <div className={`w-8 h-8 rounded-lg text-white font-bold text-xs flex items-center justify-center font-mono ${
@@ -232,6 +233,7 @@ export const Navbar = ({ currentView, setCurrentView }) => {
                 }}
                 className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors cursor-pointer"
                 title="Sign out of session"
+                aria-label="Sign out of session"
               >
                 <LogOut className="w-4 h-4" />
               </button>

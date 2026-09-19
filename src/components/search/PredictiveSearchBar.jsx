@@ -17,9 +17,32 @@ export default function PredictiveSearchBar({
   const containerRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Filter medicines predictively based on query and active mode
+  // Local input state for instantaneous keystroke responsiveness
+  const [inputValue, setInputValue] = useState(searchQuery || '');
+  // Debounced query state (120ms delay) to prevent expensive re-filtering during fast typing
+  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery || '');
+
+  // Keep local state in sync if parent updates searchQuery (e.g., direct navigation or external reset)
+  useEffect(() => {
+    setInputValue(searchQuery || '');
+    setDebouncedQuery(searchQuery || '');
+  }, [searchQuery]);
+
+  // 120ms debouncer: notifies parent and updates debounced query after typing pauses
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(inputValue);
+      if (inputValue !== searchQuery) {
+        onSearchChange(inputValue);
+      }
+    }, 120);
+
+    return () => clearTimeout(handler);
+  }, [inputValue, searchQuery, onSearchChange]);
+
+  // Filter medicines predictively based on debounced query and active mode
   const filteredSuggestions = React.useMemo(() => {
-    const q = (searchQuery || '').trim().toLowerCase();
+    const q = (debouncedQuery || '').trim().toLowerCase();
     if (!q) return [];
 
     return allMedicines.filter((med) => {
@@ -47,7 +70,7 @@ export default function PredictiveSearchBar({
         );
       }
     }).slice(0, 6); // Max 6 fast suggestions
-  }, [searchQuery, activeMode, allMedicines]);
+  }, [debouncedQuery, activeMode, allMedicines]);
 
   // Handle outside click to close dropdown
   useEffect(() => {
@@ -93,11 +116,16 @@ export default function PredictiveSearchBar({
   };
 
   const handleSelect = (medicine) => {
+    setInputValue(medicine.brandName);
+    setDebouncedQuery(medicine.brandName);
+    onSearchChange(medicine.brandName);
     onSelectMedicine(medicine);
     setIsOpen(false);
   };
 
   const handleRecentClick = (text) => {
+    setInputValue(text);
+    setDebouncedQuery(text);
     onSearchChange(text);
     // Find matching medicine if any
     const found = allMedicines.find(
@@ -109,6 +137,13 @@ export default function PredictiveSearchBar({
       onSelectMedicine(found);
     }
     setIsOpen(false);
+  };
+
+  const handleClear = () => {
+    setInputValue('');
+    setDebouncedQuery('');
+    onSearchChange('');
+    inputRef.current?.focus();
   };
 
   // Helper to highlight matching text
@@ -137,26 +172,25 @@ export default function PredictiveSearchBar({
         <input
           ref={inputRef}
           type="text"
-          value={searchQuery}
+          value={inputValue}
           onChange={(e) => {
-            onSearchChange(e.target.value);
+            setInputValue(e.target.value);
             setIsOpen(true);
           }}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholderText}
+          aria-label="Search medicines by brand, generic salt, NDC or ID"
           className="w-full pl-12 pr-12 py-3.5 bg-white text-slate-900 placeholder:text-slate-400 text-sm md:text-base rounded-2xl border-2 border-slate-200 hover:border-slate-300 focus:border-teal-600 focus:outline-none shadow-sm transition-all"
         />
 
-        {searchQuery ? (
+        {inputValue ? (
           <button
             type="button"
-            onClick={() => {
-              onSearchChange('');
-              inputRef.current?.focus();
-            }}
+            onClick={handleClear}
             className="absolute right-4 p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
             title="Clear search query"
+            aria-label="Clear search query"
           >
             <X className="w-4 h-4" />
           </button>
@@ -171,7 +205,7 @@ export default function PredictiveSearchBar({
       {isOpen && (
         <div className="absolute z-50 left-0 right-0 mt-2 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
           {/* If there is a search query */}
-          {searchQuery.trim() ? (
+          {inputValue.trim() ? (
             <div>
               <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span className="font-semibold uppercase tracking-wider text-[11px] text-teal-800">
@@ -206,7 +240,7 @@ export default function PredictiveSearchBar({
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-bold text-sm text-slate-900">
-                                {highlightMatch(med.brandName, searchQuery)}
+                                {highlightMatch(med.brandName, debouncedQuery || inputValue)}
                               </span>
                               <span className="text-xs text-slate-500 font-mono bg-slate-100 px-1.5 py-0.5 rounded">
                                 {med.strength}
@@ -229,7 +263,7 @@ export default function PredictiveSearchBar({
 
                             <p className="text-xs text-slate-600 truncate mt-0.5">
                               <span className="text-slate-400">Salt:</span>{' '}
-                              {highlightMatch(med.genericName, searchQuery)}
+                              {highlightMatch(med.genericName, debouncedQuery || inputValue)}
                             </p>
 
                             <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
@@ -260,7 +294,7 @@ export default function PredictiveSearchBar({
                 <div className="p-6 text-center text-slate-500">
                   <ShieldAlert className="w-8 h-8 text-amber-500 mx-auto mb-2 opacity-80" />
                   <p className="font-semibold text-slate-800 text-sm">
-                    No medicine matching &ldquo;{searchQuery}&rdquo; in {activeMode.replace('_', ' ')}
+                    No medicine matching &ldquo;{inputValue}&rdquo; in {activeMode.replace('_', ' ')}
                   </p>
                   <p className="text-xs text-slate-500 mt-1">
                     Try switching tabs (e.g. Generic Name, Medicine ID) or check the spelling.
@@ -280,6 +314,7 @@ export default function PredictiveSearchBar({
                   <button
                     type="button"
                     onClick={onClearRecentSearches}
+                    aria-label="Clear all recent searches"
                     className="text-[11px] font-medium text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                   >
                     Clear History
@@ -309,7 +344,8 @@ export default function PredictiveSearchBar({
                             onRemoveRecentSearch(item);
                           }}
                           className="text-slate-400 hover:text-rose-600 cursor-pointer p-0.5"
-                          title="Remove item"
+                          title={`Remove ${item} from search history`}
+                          aria-label={`Remove ${item} from search history`}
                         >
                           <X className="w-3 h-3" />
                         </button>

@@ -113,6 +113,7 @@ export const DigitalMedicalIdCard = () => {
             <button
               onClick={handlePrint}
               title="Print Medical ID Card"
+              aria-label="Print Medical ID Card"
               className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition-colors cursor-pointer"
             >
               <Printer className="w-4 h-4" />
@@ -138,6 +139,7 @@ export const DigitalMedicalIdCard = () => {
                     onClick={copyMedLinkId}
                     className="p-1 rounded bg-white/10 hover:bg-white/20 text-slate-300 transition-colors cursor-pointer"
                     title="Copy MedLink ID"
+                    aria-label="Copy MedLink ID"
                   >
                     {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>

@@ -179,6 +179,8 @@ export default function PharmacyStockCard({
             type="button"
             onClick={() => onReserve(pharmacy, medicine, inventoryItem)}
             disabled={isOutOfStock}
+            aria-label={isEmergency ? `Emergency reserve medicine at ${pharmacy.name}` : `Hold and reserve medicine for 2 hours at ${pharmacy.name}`}
+            title={isEmergency ? 'Emergency ICU Priority Reservation' : '2-Hour Stock Reservation Guarantee'}
             className={`flex-1 sm:flex-initial px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold transition-all shadow-xs inline-flex items-center justify-center gap-2 cursor-pointer ${
               isOutOfStock
                 ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
@@ -196,6 +198,8 @@ export default function PharmacyStockCard({
             <button
               type="button"
               onClick={() => onRequestDelivery(pharmacy, medicine, inventoryItem)}
+              aria-label={`Request 30-minute express delivery from ${pharmacy.name}`}
+              title="30-minute express courier delivery"
               className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl text-xs md:text-sm font-bold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200 transition-all cursor-pointer inline-flex items-center justify-center gap-1.5"
             >
               <Zap className="w-4 h-4 text-teal-600" />
@@ -207,6 +211,8 @@ export default function PharmacyStockCard({
           <button
             type="button"
             onClick={() => onDirections(pharmacy)}
+            aria-label={`Get directions to ${pharmacy.name}`}
+            title={`Directions to ${pharmacy.address}`}
             className="px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition-all cursor-pointer inline-flex items-center justify-center gap-1.5"
           >
             <Navigation className="w-3.5 h-3.5 text-slate-500" />
@@ -217,6 +223,8 @@ export default function PharmacyStockCard({
           <button
             type="button"
             onClick={() => onCallPharmacy(pharmacy)}
+            aria-label={`Call ${pharmacy.name} dispensary desk`}
+            title={`Call ${pharmacy.phone}`}
             className="px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition-all cursor-pointer inline-flex items-center justify-center gap-1.5"
           >
             <Phone className="w-3.5 h-3.5 text-slate-500" />

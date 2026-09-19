@@ -82,6 +82,7 @@ export const PatientDashboard = ({ onOpenAuthModal }) => {
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={handleSimulateEmergency}
+              aria-label="Open EMT Emergency Scan View"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-900/30 transition-all cursor-pointer"
             >
               <QrCode className="w-4 h-4" />
@@ -90,6 +91,7 @@ export const PatientDashboard = ({ onOpenAuthModal }) => {
 
             <button
               onClick={logout}
+              aria-label="Sign out of patient session"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/20 transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
@@ -209,6 +211,7 @@ export const PatientDashboard = ({ onOpenAuthModal }) => {
               </div>
               <button
                 onClick={() => setShowEmergencyBadgeModal(false)}
+                aria-label="Exit EMT emergency triage simulation"
                 className="text-slate-400 hover:text-slate-700 font-bold text-sm px-2 py-1 bg-slate-100 rounded-lg cursor-pointer"
               >
                 Exit Simulation

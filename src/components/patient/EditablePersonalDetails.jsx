@@ -122,6 +122,7 @@ export const EditablePersonalDetails = () => {
               onClick={handleCancel}
               className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-500 transition-colors cursor-pointer"
               title="Cancel editing"
+              aria-label="Cancel editing"
             >
               <X className="w-4 h-4" />
             </button>

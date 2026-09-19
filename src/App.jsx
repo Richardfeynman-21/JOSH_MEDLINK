@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 // Common Components
@@ -7,36 +7,51 @@ import { Footer } from './components/common/Footer';
 import { EmergencyBanner } from './components/common/EmergencyBanner';
 import { ToastContainer } from './components/common/ToastContainer';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
+import LoadingFallback from './components/common/LoadingFallback';
 
-// Landing & Search Components
+// Critical Landing Component (eagerly loaded for instant first paint)
 import { LandingPage } from './components/landing/LandingPage';
-import MedicineSearchMain from './components/search/MedicineSearchMain';
 
-// Patient Portal Components
-import { 
-  PatientDashboard, 
-  PatientLogin, 
-  PatientRegister, 
-  ForgotPassword 
-} from './components/patient';
+// Lazy-loaded non-critical portal routes
+const MedicineSearchMain = lazy(() => import('./components/search/MedicineSearchMain'));
 
-// Pharmacy Portal Components
-import { 
-  PharmacyDashboard, 
-  PharmacyLogin, 
-  PharmacyRegister 
-} from './components/pharmacy';
+// Patient Portal Components (lazy loaded)
+const PatientDashboard = lazy(() => 
+  import('./components/patient').then(m => ({ default: m.PatientDashboard }))
+);
+const PatientLogin = lazy(() => 
+  import('./components/patient').then(m => ({ default: m.PatientLogin }))
+);
+const PatientRegister = lazy(() => 
+  import('./components/patient').then(m => ({ default: m.PatientRegister }))
+);
+const ForgotPassword = lazy(() => 
+  import('./components/patient').then(m => ({ default: m.ForgotPassword }))
+);
 
-// Admin Portal Components
-import { 
-  AdminDashboard, 
-  AdminLogin 
-} from './components/admin';
+// Pharmacy Portal Components (lazy loaded)
+const PharmacyDashboard = lazy(() => 
+  import('./components/pharmacy').then(m => ({ default: m.PharmacyDashboard }))
+);
+const PharmacyLogin = lazy(() => 
+  import('./components/pharmacy').then(m => ({ default: m.PharmacyLogin }))
+);
+const PharmacyRegister = lazy(() => 
+  import('./components/pharmacy').then(m => ({ default: m.PharmacyRegister }))
+);
+
+// Admin Portal Components (lazy loaded)
+const AdminDashboard = lazy(() => 
+  import('./components/admin').then(m => ({ default: m.AdminDashboard }))
+);
+const AdminLogin = lazy(() => 
+  import('./components/admin').then(m => ({ default: m.AdminLogin }))
+);
 
 import './App.css';
 
 function MainApp() {
-  const { user, role, isAuthenticated, loginDemoPatient, loginDemoPharmacy, loginDemoAdmin } = useAuth();
+  const { user, role, loginDemoPatient, loginDemoPharmacy, loginDemoAdmin } = useAuth();
 
   // Top-level View: 'landing' | 'search' | 'patient' | 'pharmacy' | 'admin'
   const [currentView, setCurrentView] = useState('landing');
@@ -56,7 +71,8 @@ function MainApp() {
 
       {/* Main Content Area */}
       <main className="flex-1 pb-16">
-        {/* VIEW 1: LANDING PAGE */}
+        <Suspense fallback={<LoadingFallback />}>
+          {/* VIEW 1: LANDING PAGE */}
         {currentView === 'landing' && (
           <LandingPage onNavigate={setCurrentView} />
         )}
@@ -301,6 +317,7 @@ function MainApp() {
             )}
           </div>
         )}
+        </Suspense>
       </main>
 
       {/* Clinical Footer */}
