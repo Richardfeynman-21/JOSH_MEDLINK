@@ -17,7 +17,10 @@ import {
   ArrowRight,
   ArrowLeft,
   Sparkles,
-  FileCheck2
+  FileCheck2,
+  Lock,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
@@ -31,6 +34,8 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
     pharmacistRegId: '',
     email: '',
     phone: '',
+    password: '',
+    confirmPassword: '',
     address: '',
     pincode: '',
     open24x7: true,
@@ -42,6 +47,7 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
   });
 
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedPharmacy, setSubmittedPharmacy] = useState(null);
@@ -56,10 +62,18 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
   const validate = () => {
     const errs = {};
     if (!formData.name.trim()) errs.name = 'Pharmacy business name is required';
-    if (!formData.licenseNumber.trim()) errs.licenseNumber = 'Valid Drug License # is mandatory';
+    if (!formData.licenseNumber.trim()) errs.licenseNumber = 'Valid Drug License # is mandatory (e.g. TN-CHN-2024-84920)';
     if (!formData.pharmacistInCharge.trim()) errs.pharmacistInCharge = 'Pharmacist in-Charge Name is required';
     if (!formData.email.trim()) errs.email = 'Pharmacy official email is required';
     if (!formData.phone.trim()) errs.phone = 'Dispensary telephone number is required';
+    if (!formData.password) {
+      errs.password = 'Security password is required';
+    } else if (formData.password.length < 6) {
+      errs.password = 'Password must be at least 6 characters';
+    }
+    if (formData.password !== formData.confirmPassword) {
+      errs.confirmPassword = 'Passwords do not match';
+    }
     if (!formData.address.trim()) errs.address = 'Physical facility street address is required';
     if (!formData.pincode.trim()) errs.pincode = 'Facility PIN code is required';
     setErrors(errs);
@@ -83,21 +97,23 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
 
   const handlePreFillSample = () => {
     setFormData({
-      name: 'Apex Care Specialty & Oncology Drugs',
-      licenseNumber: 'DL-CA-99214',
-      taxId: 'TAX-US-991204',
-      pharmacistInCharge: 'Dr. Elena Rostova, PharmD',
-      pharmacistRegId: 'RPH-2025-4109',
-      email: 'elena@apexcare.org',
-      phone: '+1 (555) 883-9102',
-      address: '742 Evergreen Blvd, Suite 100, Medical District',
-      pincode: '560048',
+      name: 'Apollo Pharmacy 24/7 Dispensary',
+      licenseNumber: 'TN-CHN-2024-84920',
+      taxId: '33AAACA1234F1Z5',
+      pharmacistInCharge: 'Dr. K. Annamalai, PharmD',
+      pharmacistRegId: 'TN-RPH-2024-5109',
+      email: 'apollo.tnagar@apollopharmacy.org',
+      phone: '+91 44 2434 4991',
+      password: 'Pharmacy@123',
+      confirmPassword: 'Pharmacy@123',
+      address: 'Door 14, Usman Road, T. Nagar, Chennai',
+      pincode: '600017',
       open24x7: true,
       driveThru: true,
       emergencyReserveDesk: true,
       coldChainCertified: true,
-      licenseDocName: 'DL_CERT_APEX_2026.pdf',
-      notes: 'Trauma support capable facility with ultra-low cryogenic freezer for biopharmaceuticals.'
+      licenseDocName: 'DL_CERT_APOLLO_TN_2026.pdf',
+      notes: 'Trauma support capable facility with ultra-low cryogenic cold-chain storage (2°C-8°C).'
     });
     setErrors({});
   };
@@ -112,7 +128,7 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
         <div className="space-y-2">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-300 text-xs font-bold uppercase tracking-wider">
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-            Status: Pending Regulatory Approval
+            Status: Pending CDSCO Regulatory Approval
           </span>
           <h3 className="text-2xl font-black text-slate-900" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
             Application Submitted for Board Audit!
@@ -133,11 +149,11 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
           </div>
           <div className="flex justify-between">
             <span className="text-slate-400">Physical Zone:</span>
-            <span className="font-semibold text-slate-800">{submittedPharmacy.pincode}</span>
+            <span className="font-semibold text-slate-800">{submittedPharmacy.pincode} (Chennai)</span>
           </div>
           <div className="flex justify-between">
             <span className="text-slate-400">Reviewed By:</span>
-            <span className="font-semibold text-teal-700">Dr. Christopher Cole (Chief Regulatory Officer)</span>
+            <span className="font-semibold text-teal-700">Dr. R. Sundararajan (Chief Drug Controller, CDSCO Tamil Nadu)</span>
           </div>
         </div>
 
@@ -213,7 +229,7 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
                   type="text"
                   value={formData.name}
                   onChange={(e) => updateField('name', e.target.value)}
-                  placeholder="e.g. Green Cross 24/7 Pharmacy"
+                  placeholder="e.g. Apollo Pharmacy 24/7 Dispensary"
                   className={`w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:bg-white ${
                     errors.name ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'
                   }`}
@@ -223,13 +239,13 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Drug License Number (State/Central Board) *
+                  Drug License Number (Tamil Nadu / CDSCO) *
                 </label>
                 <input
                   type="text"
                   value={formData.licenseNumber}
                   onChange={(e) => updateField('licenseNumber', e.target.value)}
-                  placeholder="e.g. DL-CA-99214"
+                  placeholder="e.g. TN-CHN-2024-84920"
                   className={`w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-sm font-mono focus:ring-2 focus:ring-teal-500 focus:bg-white ${
                     errors.licenseNumber ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'
                   }`}
@@ -245,7 +261,7 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
                   type="text"
                   value={formData.pharmacistInCharge}
                   onChange={(e) => updateField('pharmacistInCharge', e.target.value)}
-                  placeholder="e.g. Dr. Elena Rostova, PharmD"
+                  placeholder="e.g. Dr. K. Annamalai, PharmD"
                   className={`w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:bg-white ${
                     errors.pharmacistInCharge ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'
                   }`}
@@ -261,19 +277,19 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
                   type="text"
                   value={formData.pharmacistRegId}
                   onChange={(e) => updateField('pharmacistRegId', e.target.value)}
-                  placeholder="e.g. RPH-2025-4109"
+                  placeholder="e.g. TN-RPH-2024-5109"
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-teal-500 focus:bg-white"
                 />
               </div>
             </div>
           </div>
 
-          {/* Section 2: Contact & Location */}
+          {/* Section 2: Contact & Security Credentials */}
           <div className="space-y-4">
             <div className="border-b border-slate-100 pb-2 flex items-center gap-2">
               <MapPin className="w-4 h-4 text-teal-600" />
               <h3 className="text-sm font-bold uppercase tracking-wider text-slate-900">
-                Contact & Physical Location
+                Contact & Security Access
               </h3>
             </div>
 
@@ -286,7 +302,7 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => updateField('email', e.target.value)}
-                  placeholder="orders@apexcare.org"
+                  placeholder="apollo.tnagar@apollopharmacy.org"
                   className={`w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:bg-white ${
                     errors.email ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'
                   }`}
@@ -302,12 +318,61 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => updateField('phone', e.target.value)}
-                  placeholder="+1 (555) 883-9102"
+                  placeholder="+91 44 2434 4991"
                   className={`w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:bg-white ${
                     errors.phone ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'
                   }`}
                 />
                 {errors.phone && <p className="text-xs text-rose-500 mt-1">{errors.phone}</p>}
+              </div>
+
+              {/* Password & Confirm Password */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Workstation Password *
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={(e) => updateField('password', e.target.value)}
+                    placeholder="Min. 6 characters"
+                    autoComplete="new-password"
+                    className={`w-full pl-3.5 pr-10 py-2.5 bg-slate-50 border rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:bg-white ${
+                      errors.password ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-xs text-rose-500 mt-1">{errors.password}</p>}
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Confirm Password *
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.confirmPassword}
+                    onChange={(e) => updateField('confirmPassword', e.target.value)}
+                    placeholder="Repeat password"
+                    autoComplete="new-password"
+                    className={`w-full pl-3.5 pr-10 py-2.5 bg-slate-50 border rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:bg-white ${
+                      errors.confirmPassword ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'
+                    }`}
+                  />
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-xs text-rose-500 mt-1">{errors.confirmPassword}</p>
+                )}
               </div>
 
               <div className="sm:col-span-2">
@@ -318,7 +383,7 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
                   type="text"
                   value={formData.address}
                   onChange={(e) => updateField('address', e.target.value)}
-                  placeholder="742 Evergreen Blvd, Suite 100"
+                  placeholder="Door 14, Usman Road, T. Nagar, Chennai"
                   className={`w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-sm focus:ring-2 focus:ring-teal-500 focus:bg-white ${
                     errors.address ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'
                   }`}
@@ -334,7 +399,7 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
                   type="text"
                   value={formData.pincode}
                   onChange={(e) => updateField('pincode', e.target.value)}
-                  placeholder="560048"
+                  placeholder="600017"
                   className={`w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-sm font-mono focus:ring-2 focus:ring-teal-500 focus:bg-white ${
                     errors.pincode ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'
                   }`}
@@ -344,13 +409,13 @@ export const PharmacyRegister = ({ onSwitchToLogin, onGoToAdmin }) => {
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Tax / EIN Registration
+                  GSTIN / Tax Registration
                 </label>
                 <input
                   type="text"
                   value={formData.taxId}
                   onChange={(e) => updateField('taxId', e.target.value)}
-                  placeholder="TAX-US-991204"
+                  placeholder="33AAACA1234F1Z5"
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-teal-500 focus:bg-white"
                 />
               </div>

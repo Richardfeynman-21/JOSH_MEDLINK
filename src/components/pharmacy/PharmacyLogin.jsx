@@ -26,7 +26,7 @@ export const PharmacyLogin = ({ onSwitchToRegister, onSuccess }) => {
 
   const validateForm = () => {
     if (!identifier.trim()) {
-      setError('Please enter your Drug License # (e.g. DL-CA-84920) or Pharmacy Email');
+      setError('Please enter your Drug License # (e.g. TN-CHN-2024-84920) or Pharmacy Email');
       return false;
     }
     if (!password) {
@@ -59,7 +59,7 @@ export const PharmacyLogin = ({ onSwitchToRegister, onSuccess }) => {
 
   const handleDemoLogin = () => {
     setIdentifier(DEMO_PHARMACY_USER.licenseNumber);
-    setPassword('PharmaSecure2026!');
+    setPassword('Pharmacy@123');
     loginDemoPharmacy();
     if (onSuccess) onSuccess();
   };
@@ -90,7 +90,7 @@ export const PharmacyLogin = ({ onSwitchToRegister, onSuccess }) => {
               </span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Experience the full pharmacy operating system as <strong className="text-slate-800">Green Cross 24/7 Pharmacy</strong> (License: <span className="font-mono text-teal-700 font-bold">DL-CA-84920</span>).
+              Experience the full pharmacy operating system as <strong className="text-slate-800">{DEMO_PHARMACY_USER.name}</strong> (License: <span className="font-mono text-teal-700 font-bold">{DEMO_PHARMACY_USER.licenseNumber}</span>, T. Nagar, Chennai).
             </p>
           </div>
         </div>
@@ -100,7 +100,7 @@ export const PharmacyLogin = ({ onSwitchToRegister, onSuccess }) => {
           className="mt-3 w-full inline-flex items-center justify-center gap-2 py-2.5 px-3 text-xs font-bold rounded-xl bg-teal-700 hover:bg-teal-800 text-white transition-all shadow-sm active:scale-[0.99] cursor-pointer"
         >
           <Building2 className="w-3.5 h-3.5" />
-          <span>Demo Pharmacy Login: Green Cross 24/7</span>
+          <span>Demo Pharmacy Login: Apollo Pharmacy T. Nagar</span>
           <ArrowRight className="w-3.5 h-3.5 ml-auto text-teal-200" />
         </button>
       </div>
@@ -131,13 +131,13 @@ export const PharmacyLogin = ({ onSwitchToRegister, onSuccess }) => {
                   setIdentifier(e.target.value);
                   if (error) setError('');
                 }}
-                placeholder="DL-CA-84920 or greencross@pharmacy.medlink.org"
+                placeholder="TN-CHN-2024-84920 or apollo.tnagar@apollopharmacy.org"
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all font-mono"
                 autoComplete="username"
               />
             </div>
             <p className="text-[11px] text-slate-400 mt-1">
-              State-issued Drug License Number (CDSCO / US-FDA compliant format)
+              State-issued Drug License Number (CDSCO / Tamil Nadu Drug Control compliant format)
             </p>
           </div>
 

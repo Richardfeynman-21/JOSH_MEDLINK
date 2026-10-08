@@ -87,17 +87,17 @@ export const MedicalSummary = () => {
             <div className="flex items-center gap-2 text-xs text-slate-500 pt-1">
               <span className="flex items-center gap-1">
                 <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                {user.primaryPhysician?.hospital || 'St. Jude Medical Center'}
+                {user.primaryPhysician?.hospital || 'Apollo Hospitals Greams Road, Chennai'}
               </span>
             </div>
           </div>
 
           <a
-            href={`tel:${user.primaryPhysician?.phone || '+15559021100'}`}
+            href={`tel:${user.primaryPhysician?.phone || '+914428290200'}`}
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-teal-300 hover:bg-teal-50 text-teal-800 text-xs font-bold shadow-xs transition-colors cursor-pointer"
           >
             <PhoneCall className="w-3.5 h-3.5 text-teal-600" />
-            <span>Call Clinic ({user.primaryPhysician?.phone || '+1 555-902-1100'})</span>
+            <span>Call Clinic ({user.primaryPhysician?.phone || '+91 44 2829 0200'})</span>
           </a>
         </div>
       </div>

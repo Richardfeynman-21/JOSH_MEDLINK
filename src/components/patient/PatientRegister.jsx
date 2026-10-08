@@ -14,20 +14,27 @@ import {
   Check, 
   Plus, 
   Hospital, 
-  AlertCircle 
+  AlertCircle,
+  Lock,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { BLOOD_GROUPS, COMMON_ALLERGIES, COMMON_CONDITIONS } from '../../data/mockPatientData';
 
 export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
   const { register } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
-    // Step 1: Personal Details
+    // Step 1: Personal Details & Security Credentials
     fullName: '',
     email: '',
     phone: '',
+    password: '',
+    confirmPassword: '',
     dob: '',
     gender: 'Female',
     
@@ -43,9 +50,9 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
     emergencyContactRelation: 'Spouse',
     emergencyContactPhone: '',
     street: '',
-    city: 'Metro City',
-    state: 'CA',
-    pincode: '94107',
+    city: 'Chennai',
+    state: 'Tamil Nadu',
+    pincode: '600017',
 
     // Step 4: HIPAA & Consent
     hipaaConsent: false,
@@ -121,6 +128,14 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
         newErrors.email = 'Please enter a valid email format';
       }
       if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+      if (!formData.password) {
+        newErrors.password = 'Password is required to secure your account';
+      } else if (formData.password.length < 8) {
+        newErrors.password = 'Password must be at least 8 characters';
+      }
+      if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match';
+      }
       if (!formData.dob) newErrors.dob = 'Date of birth is required';
     } else if (step === 2) {
       if (!formData.bloodGroup) newErrors.bloodGroup = 'Please select a blood group';
@@ -130,8 +145,8 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
       if (!formData.street.trim()) newErrors.street = 'Street address is required for pharmacy geo-matching';
       if (!formData.pincode.trim()) {
         newErrors.pincode = 'Pincode is required';
-      } else if (formData.pincode.trim().length < 5) {
-        newErrors.pincode = 'Valid 5-digit PIN/Postal code required';
+      } else if (formData.pincode.trim().length < 6) {
+        newErrors.pincode = 'Valid 6-digit PIN code required (e.g. 600017)';
       }
     } else if (step === 4) {
       if (!formData.hipaaConsent) {
@@ -168,9 +183,11 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
   // Pre-fill demo intake template helper
   const handlePrefillTemplate = () => {
     setFormData({
-      fullName: 'Sarah Jenkins',
-      email: 'sarah.jenkins@medlink-patient.org',
-      phone: '+1 (555) 382-9104',
+      fullName: 'Kavitha Sundaram',
+      email: 'kavitha.sundaram@medlink.in',
+      phone: '+91 98401 24892',
+      password: 'Patient@123',
+      confirmPassword: 'Patient@123',
       dob: '1992-04-14',
       gender: 'Female',
       bloodGroup: 'O-',
@@ -178,13 +195,13 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
       chronicConditions: ['Asthma (Moderate Persistent)', 'Hypertension (High Blood Pressure)'],
       customAllergy: '',
       customCondition: '',
-      emergencyContactName: 'Michael Jenkins',
+      emergencyContactName: 'Suresh Sundaram',
       emergencyContactRelation: 'Spouse',
-      emergencyContactPhone: '+1 (555) 382-9188',
-      street: '742 Evergreen Medical Parkway, Suite 3B',
-      city: 'Metro City',
-      state: 'CA',
-      pincode: '94107',
+      emergencyContactPhone: '+91 98401 24899',
+      street: 'Flat 4B, Ceebros Anand, 12 Cenotaph Road, T. Nagar',
+      city: 'Chennai',
+      state: 'Tamil Nadu',
+      pincode: '600017',
       hipaaConsent: true,
       emergencySharingConsent: true,
     });
@@ -192,7 +209,7 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
   };
 
   const stepTitles = [
-    { num: 1, label: 'Personal', desc: 'Identity' },
+    { num: 1, label: 'Personal & Auth', desc: 'Identity & Password' },
     { num: 2, label: 'Health Profile', desc: 'Blood & Allergies' },
     { num: 3, label: 'Emergency & Geo', desc: 'Pharmacy Routing' },
     { num: 4, label: 'HIPAA Consent', desc: 'Verification' }
@@ -219,7 +236,7 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
             onClick={handlePrefillTemplate}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
           >
-            <span>Pre-fill Sample Clinical Intake (Sarah Jenkins)</span>
+            <span>Pre-fill Sample Clinical Intake (Kavitha Sundaram - Chennai)</span>
           </button>
         </div>
       </div>
@@ -303,7 +320,7 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
                       type="email"
                       value={formData.email}
                       onChange={(e) => updateField('email', e.target.value)}
-                      placeholder="patient@medlink.org"
+                      placeholder="kavitha.sundaram@medlink.in"
                       className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white ${
                         errors.email ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'
                       }`}
@@ -322,13 +339,76 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => updateField('phone', e.target.value)}
-                      placeholder="+1 (555) 382-9104"
+                      placeholder="+91 98401 24892"
                       className={`w-full pl-10 pr-4 py-2.5 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white ${
                         errors.phone ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'
                       }`}
                     />
                   </div>
                   {errors.phone && <p className="text-xs text-rose-500 mt-1">{errors.phone}</p>}
+                </div>
+              </div>
+
+              {/* Password & Confirm Password */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Set Security Password *
+                  </label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={formData.password}
+                      onChange={(e) => updateField('password', e.target.value)}
+                      placeholder="Min. 8 characters"
+                      autoComplete="new-password"
+                      className={`w-full pl-10 pr-10 py-2.5 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white ${
+                        errors.password ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                      tabIndex={-1}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  {errors.password && <p className="text-xs text-rose-500 mt-1">{errors.password}</p>}
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Confirm Password *
+                  </label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={formData.confirmPassword}
+                      onChange={(e) => updateField('confirmPassword', e.target.value)}
+                      placeholder="Repeat password"
+                      autoComplete="new-password"
+                      className={`w-full pl-10 pr-10 py-2.5 bg-slate-50 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white ${
+                        errors.confirmPassword ? 'border-rose-400 ring-1 ring-rose-300' : 'border-slate-200'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer"
+                      tabIndex={-1}
+                      aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && (
+                    <p className="text-xs text-rose-500 mt-1">{errors.confirmPassword}</p>
+                  )}
                 </div>
               </div>
 
@@ -560,7 +640,7 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
                       type="text"
                       value={formData.emergencyContactName}
                       onChange={(e) => updateField('emergencyContactName', e.target.value)}
-                      placeholder="e.g. Michael Jenkins"
+                      placeholder="e.g. Suresh Sundaram"
                       className={`w-full px-3 py-2 bg-white border rounded-lg text-xs text-slate-800 focus:ring-2 focus:ring-teal-500 ${
                         errors.emergencyContactName ? 'border-rose-400' : 'border-slate-200'
                       }`}
@@ -598,7 +678,7 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
                     type="tel"
                     value={formData.emergencyContactPhone}
                     onChange={(e) => updateField('emergencyContactPhone', e.target.value)}
-                    placeholder="+1 (555) 382-9188"
+                    placeholder="+91 98401 24899"
                     className={`w-full px-3 py-2 bg-white border rounded-lg text-xs text-slate-800 focus:ring-2 focus:ring-teal-500 ${
                       errors.emergencyContactPhone ? 'border-rose-400' : 'border-slate-200'
                     }`}
@@ -624,7 +704,7 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
                     type="text"
                     value={formData.street}
                     onChange={(e) => updateField('street', e.target.value)}
-                    placeholder="742 Evergreen Medical Parkway, Suite 3B"
+                    placeholder="Flat 4B, Ceebros Anand, 12 Cenotaph Road, T. Nagar"
                     className={`w-full px-3.5 py-2.5 bg-slate-50 border rounded-xl text-sm focus:ring-2 focus:ring-teal-500 ${
                       errors.street ? 'border-rose-400' : 'border-slate-200'
                     }`}
@@ -641,7 +721,7 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
                       type="text"
                       value={formData.pincode}
                       onChange={(e) => updateField('pincode', e.target.value)}
-                      placeholder="94107"
+                      placeholder="600017"
                       className={`w-full px-3 py-2 bg-slate-50 border rounded-xl text-sm font-mono focus:ring-2 focus:ring-teal-500 ${
                         errors.pincode ? 'border-rose-400' : 'border-slate-200'
                       }`}
@@ -657,7 +737,7 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
                       type="text"
                       value={formData.city}
                       onChange={(e) => updateField('city', e.target.value)}
-                      placeholder="Metro City"
+                      placeholder="Chennai"
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
@@ -670,7 +750,7 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
                       type="text"
                       value={formData.state}
                       onChange={(e) => updateField('state', e.target.value)}
-                      placeholder="CA"
+                      placeholder="Tamil Nadu"
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
@@ -682,7 +762,7 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
                       <span>
-                        Geo-Radius Check: <strong>3 Verified Pharmacies</strong> ready within 2.5 miles of {formData.pincode}
+                        Geo-Radius Check: <strong>3 Verified Pharmacies</strong> ready within 4.0 km of {formData.pincode} (Chennai)
                       </span>
                     </div>
                     <span className="font-semibold text-teal-700 text-[11px] bg-white px-2 py-0.5 rounded border border-teal-100">
@@ -737,9 +817,8 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
 
               {/* HIPAA Agreement Toggle */}
               <div className="space-y-3 pt-1">
-                <div
-                  onClick={() => updateField('hipaaConsent', !formData.hipaaConsent)}
-                  className={`p-4 rounded-xl border transition-all cursor-pointer flex items-start gap-3.5 ${
+                <label
+                  className={`p-4 rounded-xl border transition-colors cursor-pointer flex items-start gap-3.5 select-none ${
                     formData.hipaaConsent
                       ? 'bg-teal-50/70 border-teal-300 ring-1 ring-teal-400'
                       : 'bg-white border-slate-200 hover:border-slate-300'
@@ -762,7 +841,7 @@ export const PatientRegister = ({ onSwitchToLogin, onSuccess }) => {
                       I authorize MedLink to securely encrypt (AES-256) and share my critical blood group, medication history, and severe allergies with licensed emergency medical personnel, first responders, and coordinating pharmacies in acute health situations.
                     </p>
                   </div>
-                </div>
+                </label>
                 {errors.hipaaConsent && (
                   <p className="text-xs text-rose-500 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />

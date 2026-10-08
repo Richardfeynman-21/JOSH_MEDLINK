@@ -126,13 +126,13 @@ export const AdminLogin = ({ onSuccess }) => {
                   setEmail(e.target.value);
                   if (error) setError('');
                 }}
-                placeholder="admin@medlink.org"
+                placeholder="drsundararajan@cdsco.gov.in"
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white transition-all"
                 autoComplete="email"
               />
             </div>
             <p className="text-[11px] text-slate-400 mt-1">
-              Restricted to authorized MedLink central regulatory personnel
+              Restricted to authorized CDSCO / Tamil Nadu Drug Control central regulatory personnel
             </p>
           </div>
 

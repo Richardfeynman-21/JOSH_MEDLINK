@@ -28,3 +28,64 @@
 .animate-scaleUp {
   animation: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Glassmorphism and Spatial Depth Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.glass-panel-dark {
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.antigravity-float {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+
+.antigravity-float:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -6px rgba(13, 148, 136, 0.12), 0 6px 14px -4px rgba(15, 23, 42, 0.06);
+}
+
+/* Tabular Numbers for Clinical Quantities & Currency */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sleek Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.7);
+}
+
+/* Accessibility: Strict Reduced Motion Compliance */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

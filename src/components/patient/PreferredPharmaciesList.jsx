@@ -91,7 +91,7 @@ export const PreferredPharmaciesList = () => {
                 <div className="text-left sm:text-right flex-shrink-0">
                   <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-teal-50 text-teal-800 font-mono text-xs font-bold border border-teal-200">
                     <MapPin className="w-3.5 h-3.5 text-teal-600" />
-                    <span>{pharmacy.distanceMiles} miles away</span>
+                    <span>{pharmacy.distanceKm || pharmacy.distanceMiles || 1.2} km away</span>
                   </div>
                   <p className="text-[11px] text-emerald-700 font-medium mt-1">
                     {pharmacy.inStockScore}

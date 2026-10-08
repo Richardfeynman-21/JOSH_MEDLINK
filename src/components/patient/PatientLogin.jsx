@@ -59,7 +59,7 @@ export const PatientLogin = ({ onSwitchToRegister, onSwitchToForgot, onSuccess }
 
   const handleDemoLogin = () => {
     setIdentifier(DEMO_PATIENT.email);
-    setPassword('EmergencyDemo2026!');
+    setPassword('Patient@123');
     loginDemoPatient();
     if (onSuccess) onSuccess();
   };
@@ -90,7 +90,7 @@ export const PatientLogin = ({ onSwitchToRegister, onSwitchToForgot, onSuccess }
               </span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Test full clinical features as <strong className="text-slate-800">Sarah Jenkins</strong> (ID: <span className="font-mono text-teal-700">#ML-849201</span>, Blood: <span className="text-rose-600 font-semibold">O-Neg</span>).
+              Test full clinical features as <strong className="text-slate-800">{DEMO_PATIENT.fullName}</strong> (ID: <span className="font-mono text-teal-700">{DEMO_PATIENT.id}</span>, Blood: <span className="text-rose-600 font-semibold">{DEMO_PATIENT.bloodGroup}</span>, Chennai).
             </p>
           </div>
         </div>
@@ -131,7 +131,7 @@ export const PatientLogin = ({ onSwitchToRegister, onSwitchToForgot, onSuccess }
                   setIdentifier(e.target.value);
                   if (error) setError('');
                 }}
-                placeholder="sarah@medlink.org or #ML-849201"
+                placeholder="kavitha@medlink.in or #ML-849201"
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all"
                 autoComplete="username"
               />

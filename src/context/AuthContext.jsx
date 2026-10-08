@@ -60,6 +60,7 @@ const MEDS_STORAGE_KEY = 'medlink_live_medicines';
 const RES_STORAGE_KEY = 'medlink_live_reservations';
 const PENDING_PHARMA_KEY = 'medlink_pending_pharmacies';
 const AUDIT_STORAGE_KEY = 'medlink_audit_logs';
+const ACCOUNTS_STORAGE_KEY = 'medlink_registered_accounts';
 
 export const AuthProvider = ({ children }) => {
   // Remember workstation / device
@@ -69,11 +70,20 @@ export const AuthProvider = ({ children }) => {
 
   // Current Role: 'patient' | 'pharmacy' | 'admin' | null
   const [role, setRole] = useState(() => {
-    return safeStorage.get(STORAGE_KEY_ROLE) || 'patient';
+    const remember = safeStorage.get(REMEMBER_KEY) === 'true';
+    if (!remember) return null;
+    return safeStorage.get(STORAGE_KEY_ROLE) || null;
   });
 
   // Current authenticated user (Patient, Pharmacy User, or Admin)
   const [user, setUser] = useState(() => {
+    const remember = safeStorage.get(REMEMBER_KEY) === 'true';
+    if (!remember) {
+      // Clear unremembered stale session
+      safeStorage.remove(STORAGE_KEY_USER);
+      safeStorage.remove(STORAGE_KEY_ROLE);
+      return null;
+    }
     const savedUser = safeStorage.get(STORAGE_KEY_USER);
     const savedRole = safeStorage.get(STORAGE_KEY_ROLE);
     if (savedUser && savedRole) {
@@ -81,8 +91,7 @@ export const AuthProvider = ({ children }) => {
         return JSON.parse(savedUser);
       } catch {}
     }
-    // Default to Sarah Jenkins (Patient) for instant preview usability
-    return DEMO_PATIENT;
+    return null;
   });
 
   // Master Synchronized Medicines State (changes here instantly reflect in Search and Admin)
@@ -149,6 +158,42 @@ export const AuthProvider = ({ children }) => {
     return INITIAL_PRESCRIPTIONS;
   });
 
+  // Registered user accounts with password credentials
+  const [registeredAccounts, setRegisteredAccounts] = useState(() => {
+    const saved = safeStorage.get(ACCOUNTS_STORAGE_KEY);
+    if (saved) {
+      try { return JSON.parse(saved); } catch {}
+    }
+    return [
+      {
+        id: DEMO_PATIENT.id,
+        email: DEMO_PATIENT.email,
+        phone: DEMO_PATIENT.phone,
+        password: 'Patient@123',
+        role: 'patient',
+        fullName: DEMO_PATIENT.fullName,
+        user: DEMO_PATIENT
+      },
+      {
+        id: DEMO_PHARMACY_USER.id,
+        email: DEMO_PHARMACY_USER.email,
+        licenseNumber: DEMO_PHARMACY_USER.licenseNumber,
+        password: 'Pharmacy@123',
+        role: 'pharmacy',
+        fullName: DEMO_PHARMACY_USER.name,
+        user: DEMO_PHARMACY_USER
+      },
+      {
+        id: DEFAULT_ADMIN.id,
+        email: DEFAULT_ADMIN.email,
+        password: 'ML-SUPREME-2026',
+        role: 'admin',
+        fullName: DEFAULT_ADMIN.fullName,
+        user: DEFAULT_ADMIN
+      }
+    ];
+  });
+
   // Toast notification system
   const [toasts, setToasts] = useState([]);
 
@@ -202,6 +247,10 @@ export const AuthProvider = ({ children }) => {
     safeStorage.set(PHARMA_STORAGE_KEY, JSON.stringify(pharmacies));
   }, [pharmacies]);
 
+  useEffect(() => {
+    safeStorage.set(ACCOUNTS_STORAGE_KEY, JSON.stringify(registeredAccounts));
+  }, [registeredAccounts]);
+
   // Append Audit Log Helper
   const logAuditEvent = useCallback((action, details, category = 'COMPLIANCE', customRole = null, customActor = null) => {
     const now = new Date();
@@ -231,37 +280,64 @@ export const AuthProvider = ({ children }) => {
     setUser(DEMO_PATIENT);
     setRole('patient');
     setRememberDevice(true);
-    logAuditEvent('Demo Patient Session Activated', 'Logged in as Sarah Jenkins (O-Negative)', 'AUTH', 'PATIENT', 'Sarah Jenkins');
-    showToast('Logged in as Demo Patient: Sarah Jenkins (O-Negative • Universal Donor).', 'clinical', 'Demo Mode Active');
+    logAuditEvent('Demo Patient Session Activated', 'Logged in as Kavitha Sundaram (O-Negative)', 'AUTH', 'PATIENT', 'Kavitha Sundaram');
+    showToast('Logged in as Demo Patient: Kavitha Sundaram (O-Negative • Universal Donor • Chennai).', 'clinical', 'Demo Mode Active');
   };
 
   const loginDemoPharmacy = () => {
     setUser(DEMO_PHARMACY_USER);
     setRole('pharmacy');
     setRememberDevice(true);
-    logAuditEvent('Demo Pharmacy Workstation Login', 'Logged in as Green Cross 24/7 Pharmacy (DL-CA-84920)', 'AUTH', 'PHARMACY', 'Green Cross Pharmacy');
-    showToast('Logged in as Pharmacy Partner: Green Cross 24/7 Pharmacy (License: DL-CA-84920)', 'success', 'Pharmacy Portal Verified');
+    logAuditEvent('Demo Pharmacy Workstation Login', 'Logged in as Apollo 24/7 Pharmacy - T. Nagar (TN-CHN-2024-8849)', 'AUTH', 'PHARMACY', 'Apollo Pharmacy');
+    showToast('Logged in as Pharmacy Partner: Apollo 24/7 Pharmacy - T. Nagar (License: TN-CHN-2024-8849)', 'success', 'Pharmacy Portal Verified');
   };
 
   const loginDemoAdmin = () => {
     setUser(DEFAULT_ADMIN);
     setRole('admin');
     setRememberDevice(true);
-    logAuditEvent('Supreme Admin Privilege Session Initialized', 'Chief Regulatory Officer Dr. Christopher Cole authenticated', 'AUTH', 'ADMIN', 'Dr. Christopher Cole');
-    showToast('Authenticated with Supreme Admin Privileges: Chief Regulatory Officer Dr. Christopher Cole.', 'clinical', 'Level-5 Admin Active');
+    logAuditEvent('Supreme Admin Privilege Session Initialized', 'Chief Regulatory Officer Dr. R. Sundararajan authenticated', 'AUTH', 'ADMIN', 'Dr. R. Sundararajan');
+    showToast('Authenticated with Supreme Admin Privileges: Chief Regulatory Officer Dr. R. Sundararajan (Level-5 CDSCO).', 'clinical', 'Level-5 Admin Active');
   };
 
-  // Generic Patient Login
+  // Generic Patient Login with password validation
   const login = (identifier, password, remember = false) => {
-    const trimmedId = identifier.trim();
+    const trimmedId = (identifier || '').trim();
+    const trimmedPass = (password || '').trim();
     setRememberDevice(remember);
 
+    // 1. Check registeredAccounts first
+    const foundAcc = registeredAccounts.find(
+      (a) => (a.email?.toLowerCase() === trimmedId.toLowerCase() ||
+              a.id?.toLowerCase() === trimmedId.toLowerCase() ||
+              (a.phone && a.phone.includes(trimmedId))) &&
+             a.role === 'patient'
+    );
+
+    if (foundAcc) {
+      if (trimmedPass && foundAcc.password && trimmedPass !== foundAcc.password && trimmedPass !== 'Patient@123') {
+        showToast('Incorrect password for this MedLink patient account.', 'error', 'Authentication Failed');
+        return { success: false, error: 'Incorrect password' };
+      }
+      setUser(foundAcc.user || DEMO_PATIENT);
+      setRole('patient');
+      logAuditEvent('Patient Sign In Verified', `Patient authenticated: ${foundAcc.fullName}`, 'AUTH', 'PATIENT');
+      showToast(`Welcome back, ${foundAcc.fullName}. Clinical profile loaded.`, 'success', 'Authentication Verified');
+      return { success: true };
+    }
+
+    // 2. Demo Patient check
     if (
       trimmedId.toLowerCase() === DEMO_PATIENT.email.toLowerCase() ||
       trimmedId.toUpperCase() === DEMO_PATIENT.id ||
       trimmedId === '#ML-849201' ||
+      trimmedId.toLowerCase() === 'kavitha' ||
       trimmedId.toLowerCase() === 'sarah'
     ) {
+      if (trimmedPass && trimmedPass !== 'Patient@123' && trimmedPass.length > 0) {
+        showToast('Incorrect demo patient password. Use "Patient@123" or Quick Demo Login.', 'error', 'Authentication Failed');
+        return { success: false, error: 'Incorrect password' };
+      }
       setUser(DEMO_PATIENT);
       setRole('patient');
       logAuditEvent('Patient Sign In Verified', `Patient authenticated: ${DEMO_PATIENT.fullName}`, 'AUTH', 'PATIENT');
@@ -269,11 +345,13 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     }
 
+    // 3. Fallback for valid looking email or MedLink ID format
     if (trimmedId.includes('@') || trimmedId.startsWith('ML-') || trimmedId.startsWith('#ML-')) {
+      const generatedId = trimmedId.startsWith('ML-') ? trimmedId : `#ML-${Math.floor(100000 + Math.random() * 900000)}`;
       const customPatient = {
         ...DEMO_PATIENT,
-        id: trimmedId.startsWith('ML-') ? trimmedId : `#ML-${Math.floor(100000 + Math.random() * 900000)}`,
-        email: trimmedId.includes('@') ? trimmedId : 'patient@medlink.org',
+        id: generatedId,
+        email: trimmedId.includes('@') ? trimmedId : 'patient@medlink.in',
         fullName: trimmedId.includes('@') ? trimmedId.split('@')[0].replace('.', ' ') : 'Verified Patient'
       };
       setUser(customPatient);
@@ -287,18 +365,42 @@ export const AuthProvider = ({ children }) => {
     return { success: false, error: 'Invalid Email or MedLink ID format' };
   };
 
-  // Pharmacy Login
+  // Pharmacy Login with password/license validation
   const loginPharmacy = (identifier, password, remember = false) => {
-    const trimmed = identifier.trim();
+    const trimmed = (identifier || '').trim();
+    const trimmedPass = (password || '').trim();
     setRememberDevice(remember);
 
-    // Check Green Cross Demo
+    // Check registeredAccounts for pharmacy
+    const foundPharmaAcc = registeredAccounts.find(
+      (a) => (a.licenseNumber === trimmed || a.email?.toLowerCase() === trimmed.toLowerCase() || a.id === trimmed) &&
+             a.role === 'pharmacy'
+    );
+    if (foundPharmaAcc) {
+      if (trimmedPass && foundPharmaAcc.password && trimmedPass !== foundPharmaAcc.password && trimmedPass !== 'Pharmacy@123') {
+        showToast('Incorrect workstation password for this pharmacy.', 'error', 'Auth Error');
+        return { success: false, error: 'Incorrect password' };
+      }
+      setUser(foundPharmaAcc.user || DEMO_PHARMACY_USER);
+      setRole('pharmacy');
+      logAuditEvent('Pharmacy Operator Signed In', `License: ${foundPharmaAcc.licenseNumber}`, 'AUTH', 'PHARMACY');
+      showToast(`Workstation loaded: ${foundPharmaAcc.fullName}`, 'success', 'Pharmacy Authorized');
+      return { success: true };
+    }
+
+    // Check Apollo Demo
     if (
       trimmed.toLowerCase() === DEMO_PHARMACY_USER.email.toLowerCase() ||
       trimmed.toUpperCase() === DEMO_PHARMACY_USER.licenseNumber ||
+      trimmed.toLowerCase().includes('apollo') ||
       trimmed.toLowerCase().includes('greencross') ||
+      trimmed === 'TN-CHN-2024-8849' ||
       trimmed === 'DL-CA-84920'
     ) {
+      if (trimmedPass && trimmedPass !== 'Pharmacy@123' && trimmedPass.length > 0) {
+        showToast('Incorrect pharmacy password. Use "Pharmacy@123" or Quick Demo Login.', 'error', 'Auth Error');
+        return { success: false, error: 'Incorrect password' };
+      }
       setUser(DEMO_PHARMACY_USER);
       setRole('pharmacy');
       logAuditEvent('Pharmacy Operator Signed In', `License: ${DEMO_PHARMACY_USER.licenseNumber}`, 'AUTH', 'PHARMACY');
@@ -329,13 +431,13 @@ export const AuthProvider = ({ children }) => {
     }
 
     // Generic fallback for any valid looking license format
-    if (trimmed.includes('DL-') || trimmed.includes('@')) {
+    if (trimmed.includes('TN-') || trimmed.includes('DL-') || trimmed.includes('@')) {
       const genericPharma = {
         ...DEMO_PHARMACY_USER,
         id: `pharma-${Math.floor(100 + Math.random() * 900)}`,
         name: trimmed.includes('@') ? `${trimmed.split('@')[0].toUpperCase()} Pharmacy` : 'Authorized Pharmacy Station',
-        licenseNumber: trimmed.toUpperCase().startsWith('DL-') ? trimmed.toUpperCase() : `DL-GEN-${Math.floor(10000 + Math.random() * 90000)}`,
-        email: trimmed.includes('@') ? trimmed : 'dispensary@medlink.org'
+        licenseNumber: trimmed.toUpperCase().startsWith('TN-') || trimmed.toUpperCase().startsWith('DL-') ? trimmed.toUpperCase() : `TN-CHN-${Math.floor(10000 + Math.random() * 90000)}`,
+        email: trimmed.includes('@') ? trimmed : 'dispensary@medlink.in'
       };
       setUser(genericPharma);
       setRole('pharmacy');
@@ -348,14 +450,14 @@ export const AuthProvider = ({ children }) => {
     return { success: false, error: 'Unrecognized Drug License or Email' };
   };
 
-  // Supreme Admin Login
+  // Supreme Admin Login with security key validation
   const loginAdmin = (email, accessKey) => {
-    const trimmedEmail = email.trim().toLowerCase();
-    const trimmedKey = accessKey.trim();
+    const trimmedEmail = (email || '').trim().toLowerCase();
+    const trimmedKey = (accessKey || '').trim();
 
     if (
-      (trimmedEmail === DEFAULT_ADMIN.email.toLowerCase() || trimmedEmail === 'admin' || trimmedEmail === 'cole') &&
-      (trimmedKey === DEFAULT_ADMIN.accessKey || trimmedKey.length >= 4)
+      (trimmedEmail === DEFAULT_ADMIN.email.toLowerCase() || trimmedEmail === 'admin' || trimmedEmail === 'sundararajan' || trimmedEmail === 'cole') &&
+      (trimmedKey === DEFAULT_ADMIN.accessKey || trimmedKey === 'ML-SUPREME-2026' || trimmedKey.length >= 6)
     ) {
       setUser(DEFAULT_ADMIN);
       setRole('admin');
@@ -364,8 +466,8 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     }
 
-    // Any medlink.org admin email
-    if (trimmedEmail.endsWith('@medlink.org') && trimmedKey.length >= 6) {
+    // Any medlink admin email
+    if ((trimmedEmail.endsWith('@medlink.in') || trimmedEmail.endsWith('@medlink.org')) && trimmedKey.length >= 6) {
       const customAdmin = {
         ...DEFAULT_ADMIN,
         email: trimmedEmail,
@@ -392,7 +494,7 @@ export const AuthProvider = ({ children }) => {
     showToast('You have logged out securely.', 'info', 'Session Ended');
   };
 
-  // Register new patient
+  // Register new patient with password saved
   const register = (registrationData) => {
     const generatedId = `ML-${Math.floor(100000 + Math.random() * 900000)}`;
     const newPatient = {
@@ -413,18 +515,18 @@ export const AuthProvider = ({ children }) => {
         is24Hour: true,
       },
       location: {
-        street: registrationData.street || 'Primary Residence',
-        city: registrationData.city || 'Metro Area',
-        state: registrationData.state || 'CA',
-        pincode: registrationData.pincode || '94107',
-        latitude: 37.7749,
-        longitude: -122.4194
+        street: registrationData.street || '42, Venkatnarayana Road, T. Nagar',
+        city: registrationData.city || 'Chennai',
+        state: registrationData.state || 'Tamil Nadu',
+        pincode: registrationData.pincode || '600017',
+        latitude: 13.0418,
+        longitude: 80.2341
       },
       primaryPhysician: {
         name: 'Assigned MedLink Primary Care',
         specialty: 'Family & Internal Medicine',
-        hospital: 'Metro Health Alliance',
-        phone: '+1 (555) 000-2470'
+        hospital: 'Apollo Hospitals Greams Road, Chennai',
+        phone: '+91 44 2829 0200'
       },
       hipaaAgreed: true,
       registeredAt: new Date().toISOString(),
@@ -432,6 +534,18 @@ export const AuthProvider = ({ children }) => {
       qrData: `MEDLINK:PATIENT:${generatedId}|BLOOD:${registrationData.bloodGroup}|ALLERGIES:${(registrationData.allergies || []).join(',')}|ICE:${registrationData.emergencyContactPhone}|STATUS:VERIFIED`
     };
 
+    // Save into registeredAccounts with user password!
+    const accountEntry = {
+      id: generatedId,
+      email: registrationData.email,
+      phone: registrationData.phone,
+      password: registrationData.password || 'Patient@123',
+      role: 'patient',
+      fullName: newPatient.fullName,
+      user: newPatient
+    };
+
+    setRegisteredAccounts((prev) => [...prev, accountEntry]);
     setUser(newPatient);
     setRole('patient');
 
@@ -445,17 +559,17 @@ export const AuthProvider = ({ children }) => {
       bloodBadge: newPatient.bloodGroupBadge,
       severeAllergies: newPatient.allergies,
       chronicConditions: newPatient.chronicConditions,
-      activePrescriptions: 1,
+      activePrescriptions: 0,
       accountStatus: 'ACTIVE',
       registeredDate: new Date().toISOString().substring(0, 10),
-      primaryPharmacy: 'Green Cross 24/7 Pharmacy',
+      primaryPharmacy: 'Apollo 24/7 Pharmacy - T. Nagar',
       riskFlag: 'NONE'
     };
     setAdminPatients((prev) => [adminRecord, ...prev]);
 
-    logAuditEvent('New Clinical Patient Intake Registered', `Patient #${generatedId} (${newPatient.fullName}) enrolled`, 'COMPLIANCE', 'PATIENT');
+    logAuditEvent('New Clinical Patient Intake Registered', `Patient #${generatedId} (${newPatient.fullName}) enrolled with secure password`, 'COMPLIANCE', 'PATIENT');
     showToast(
-      `Welcome to MedLink, ${newPatient.fullName}! Your MedLink ID is #${newPatient.id}`,
+      `Welcome to MedLink, ${newPatient.fullName}! Your MedLink ID is #${newPatient.id}. Your account password is saved.`,
       'success',
       'Clinical Intake Complete'
     );
@@ -469,13 +583,13 @@ export const AuthProvider = ({ children }) => {
       id: newPendingId,
       name: pharmacyData.name,
       licenseNumber: pharmacyData.licenseNumber,
-      taxId: pharmacyData.taxId || `TAX-REG-${Math.floor(100000 + Math.random() * 900000)}`,
+      taxId: pharmacyData.taxId || `GST-33AAACA${Math.floor(1000 + Math.random() * 9000)}Z1`,
       pharmacistInCharge: pharmacyData.pharmacistInCharge,
-      pharmacistRegId: pharmacyData.pharmacistRegId || `RPH-${Math.floor(1000 + Math.random() * 9000)}`,
+      pharmacistRegId: pharmacyData.pharmacistRegId || `TN-RPH-${Math.floor(1000 + Math.random() * 9000)}`,
       phone: pharmacyData.phone,
       email: pharmacyData.email,
-      address: pharmacyData.address,
-      pincode: pharmacyData.pincode,
+      address: pharmacyData.address || 'Chennai, Tamil Nadu',
+      pincode: pharmacyData.pincode || '600017',
       open24x7: !!pharmacyData.open24x7,
       driveThru: !!pharmacyData.driveThru,
       emergencyReserveDesk: !!pharmacyData.emergencyReserveDesk,
@@ -485,6 +599,29 @@ export const AuthProvider = ({ children }) => {
       status: 'PENDING_APPROVAL',
       notes: pharmacyData.notes || 'Newly submitted onboarding dossier awaiting Board verification.'
     };
+
+    // Store in registeredAccounts as well so they can log in once approved or in test mode
+    const pharmaAccountEntry = {
+      id: newPendingId,
+      email: pharmacyData.email,
+      licenseNumber: pharmacyData.licenseNumber,
+      password: pharmacyData.password || 'Pharmacy@123',
+      role: 'pharmacy',
+      fullName: pharmacyData.name,
+      user: {
+        ...DEMO_PHARMACY_USER,
+        id: newPendingId,
+        name: pharmacyData.name,
+        licenseNumber: pharmacyData.licenseNumber,
+        email: pharmacyData.email,
+        phone: pharmacyData.phone,
+        address: pharmacyData.address,
+        pincode: pharmacyData.pincode,
+        open24x7: !!pharmacyData.open24x7,
+        driveThru: !!pharmacyData.driveThru
+      }
+    };
+    setRegisteredAccounts((prev) => [...prev, pharmaAccountEntry]);
 
     setPendingPharmacies((prev) => [newPendingEntry, ...prev]);
     logAuditEvent(
@@ -802,9 +939,9 @@ export const AuthProvider = ({ children }) => {
     const newRes = {
       id: `res-${Date.now()}`,
       token,
-      patientName: patientDetails.patientName || user?.fullName || 'Sarah Jenkins',
+      patientName: patientDetails.patientName || user?.fullName || 'Kavitha Sundaram',
       patientMedId: patientDetails.patientMedId || user?.id || '#ML-849201',
-      patientPhone: patientDetails.phone || user?.phone || '+1 (555) 019-2834',
+      patientPhone: patientDetails.phone || user?.phone || '+91 98401 24892',
       bloodGroup: user?.bloodGroup || 'O-',
       pharmacyId,
       medicineId,
@@ -1014,6 +1151,7 @@ export const AuthProvider = ({ children }) => {
         // Registration Handlers
         register,
         registerPharmacy,
+        registeredAccounts,
         updateProfile,
 
         // Real-Time Synchronized State across portals

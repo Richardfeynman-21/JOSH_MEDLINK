@@ -21,8 +21,16 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-export const LandingPage = ({ onNavigate }) => {
+export const LandingPage = ({ onNavigate, onOpenAuth }) => {
   const { loginDemoPatient, loginDemoPharmacy, loginDemoAdmin } = useAuth();
+
+  const handleOpenAuth = (role = 'patient', mode = 'login') => {
+    if (onOpenAuth) {
+      onOpenAuth(role, mode);
+    } else {
+      onNavigate('auth');
+    }
+  };
 
   return (
     <div className="space-y-16 py-8 animate-fadeIn">
@@ -74,6 +82,13 @@ export const LandingPage = ({ onNavigate }) => {
                 className="px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 transition-colors cursor-pointer"
               >
                 Pharmacy Workstation
+              </button>
+
+              <button
+                onClick={() => onNavigate('admin')}
+                className="px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm border border-white/20 transition-colors cursor-pointer"
+              >
+                Admin Console
               </button>
             </div>
 
@@ -179,23 +194,34 @@ export const LandingPage = ({ onNavigate }) => {
 
             <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
               <button
+                type="button"
                 onClick={() => {
                   loginDemoPatient();
                   onNavigate('patient');
                 }}
-                className="w-full py-2.5 px-4 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold border border-teal-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold border border-teal-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
               >
                 <Sparkles className="w-3.5 h-3.5 text-teal-600" />
-                <span>Demo Patient: Sarah Jenkins (O-)</span>
+                <span>Demo Patient: Kavitha Sundaram (O-)</span>
               </button>
 
-              <button
-                onClick={() => onNavigate('patient')}
-                className="w-full py-2.5 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <span>Launch Patient Portal</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => onNavigate('patient')}
+                  className="w-full py-2.5 px-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                >
+                  <span>Dashboard</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOpenAuth('patient', 'login')}
+                  className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors flex items-center justify-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                >
+                  <span>Sign In / Reg</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -234,23 +260,34 @@ export const LandingPage = ({ onNavigate }) => {
 
             <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
               <button
+                type="button"
                 onClick={() => {
                   loginDemoPharmacy();
                   onNavigate('pharmacy');
                 }}
-                className="w-full py-2.5 px-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
               >
                 <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Demo Pharmacy: Green Cross 24/7</span>
+                <span>Demo Pharmacy: Apollo Pharmacy (T. Nagar)</span>
               </button>
 
-              <button
-                onClick={() => onNavigate('pharmacy')}
-                className="w-full py-2.5 px-4 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <span>Launch Pharmacy Station</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => onNavigate('pharmacy')}
+                  className="w-full py-2.5 px-3 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                >
+                  <span>Workstation</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOpenAuth('pharmacy', 'login')}
+                  className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors flex items-center justify-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                >
+                  <span>Pharmacy Login</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -289,23 +326,34 @@ export const LandingPage = ({ onNavigate }) => {
 
             <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
               <button
+                type="button"
                 onClick={() => {
                   loginDemoAdmin();
                   onNavigate('admin');
                 }}
-                className="w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 text-xs font-bold border border-rose-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 text-xs font-bold border border-rose-200 transition-colors flex items-center justify-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
               >
                 <Sparkles className="w-3.5 h-3.5 text-rose-600" />
-                <span>Demo Admin: Dr. Christopher Cole</span>
+                <span>Demo Admin: Dr. R. Sundararajan</span>
               </button>
 
-              <button
-                onClick={() => onNavigate('admin')}
-                className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <span>Launch Admin Console</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => onNavigate('admin')}
+                  className="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                >
+                  <span>Admin Console</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOpenAuth('admin', 'login')}
+                  className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors flex items-center justify-center gap-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                >
+                  <span>Admin Login</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -17,26 +17,44 @@ import {
 } from 'lucide-react';
 
 export const PatientDashboard = ({ onOpenAuthModal }) => {
-  const { user, logout, prescriptions, pharmacies, showToast } = useAuth();
+  const { user, role, logout, prescriptions, pharmacies, showToast, loginDemoPatient } = useAuth();
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'prescriptions' | 'pharmacies' | 'demographics'
   const [showEmergencyBadgeModal, setShowEmergencyBadgeModal] = useState(false);
 
-  if (!user) {
+  if (!user || role !== 'patient') {
     return (
-      <div className="max-w-xl mx-auto my-12 text-center bg-white p-8 rounded-3xl border border-slate-200 shadow-xl space-y-4">
-        <div className="w-16 h-16 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto border border-teal-100">
+      <div className="max-w-xl mx-auto my-12 text-center bg-white p-8 sm:p-10 rounded-3xl border border-slate-200 shadow-xl space-y-5 animate-fadeIn">
+        <div className="w-16 h-16 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto border border-teal-100 shadow-sm">
           <HeartPulse className="w-8 h-8" />
         </div>
-        <h3 className="text-xl font-bold text-slate-900">Patient Authentication Required</h3>
-        <p className="text-sm text-slate-500">
-          Sign in or register to inspect your verified digital medical ID, active prescriptions, and nearby pharmacies.
-        </p>
-        <button
-          onClick={onOpenAuthModal}
-          className="px-6 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold shadow-md shadow-teal-600/20 transition-all cursor-pointer"
-        >
-          Open Patient Sign In / Registration
-        </button>
+        <div className="space-y-2">
+          <h3 className="text-xl font-bold text-slate-900">
+            {user ? 'Patient Portal Switch Required' : 'Patient Authentication Required'}
+          </h3>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            {user ? (
+              <>You are currently authenticated as <span className="font-bold text-slate-700">{user.fullName || user.name || role}</span> ({role.toUpperCase()}). To access the patient health record and verified digital medical card, switch to a patient profile.</>
+            ) : (
+              <>Sign in or register to inspect your verified digital medical ID, active prescriptions, and nearby pharmacies in Chennai.</>
+            )}
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <button
+            type="button"
+            onClick={onOpenAuthModal}
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold shadow-md shadow-teal-600/20 transition-all cursor-pointer"
+          >
+            Open Patient Sign In / Registration
+          </button>
+          <button
+            type="button"
+            onClick={loginDemoPatient}
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-bold border border-slate-200 transition-all cursor-pointer"
+          >
+            Instant Demo Patient (Kavitha • O-)
+          </button>
+        </div>
       </div>
     );
   }

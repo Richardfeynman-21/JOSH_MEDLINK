@@ -43,7 +43,8 @@ export const PharmacyDashboard = ({ onOpenAuthModal }) => {
     deliveryOrders,
     dispatchDeliveryOrder,
     updatePharmacySettings,
-    showToast
+    showToast,
+    loginDemoPharmacy
   } = useAuth();
 
   // Active Tab: 'inventory' | 'reservations' | 'deliveries' | 'settings'
@@ -79,7 +80,7 @@ export const PharmacyDashboard = ({ onOpenAuthModal }) => {
     lowStockThreshold: user?.lowStockThreshold ?? 15,
     criticalICUReserveRatio: user?.criticalICUReserveRatio ?? 20,
     pharmacistInCharge: user?.pharmacistInCharge || 'Dr. Rajiv Menon, PharmD',
-    phone: user?.phone || '+1 (555) 234-8849'
+    phone: user?.phone || '+91 44 2434 4991'
   });
 
   const pharmacyId = user?.id || 'pharma-1';
@@ -199,6 +200,44 @@ export const PharmacyDashboard = ({ onOpenAuthModal }) => {
     return { text, color: 'text-teal-800 bg-teal-50 border-teal-200 font-medium' };
   };
 
+  if (!user || role !== 'pharmacy') {
+    return (
+      <div className="max-w-xl mx-auto my-12 text-center bg-white p-8 sm:p-10 rounded-3xl border border-emerald-200 shadow-xl space-y-5 animate-fadeIn">
+        <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-100 shadow-sm">
+          <Building2 className="w-8 h-8" />
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-xl font-bold text-slate-900">
+            {user ? 'Dispensary Access Restricted' : 'Pharmacy Authentication Required'}
+          </h3>
+          <p className="text-sm text-slate-500 leading-relaxed">
+            {user ? (
+              <>You are currently authenticated as <span className="font-bold text-slate-700">{user.fullName || user.name || role}</span> ({role.toUpperCase()}). Please sign in with registered dispensary credentials to access live stock inventory and shelf reservations.</>
+            ) : (
+              <>Sign in with your registered TN Pharmacy Council / CDSCO dispensary credentials to manage live drug stock, 2-hour hold reservations, and courier delivery dispatches.</>
+            )}
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <button
+            type="button"
+            onClick={onOpenAuthModal}
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold shadow-md shadow-teal-600/20 transition-all cursor-pointer"
+          >
+            Dispensary Partner Sign In
+          </button>
+          <button
+            type="button"
+            onClick={loginDemoPharmacy}
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-bold border border-slate-200 transition-all cursor-pointer"
+          >
+            Instant Demo Pharmacy (Apollo 24/7)
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 animate-fadeIn">
       {/* Pharmacy Master Command Banner */}
@@ -213,7 +252,7 @@ export const PharmacyDashboard = ({ onOpenAuthModal }) => {
                 <span>Licensed Dispensary Station</span>
               </span>
               <span className="font-mono text-xs bg-white/10 px-2.5 py-1 rounded-full text-slate-200 border border-white/10">
-                License: {user?.licenseNumber || 'DL-CA-84920'}
+                License: {user?.licenseNumber || 'TN-CHN-2024-84920'}
               </span>
               {storeSettings.open24x7 && (
                 <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-300 bg-emerald-500/20 px-2.5 py-1 rounded-full border border-emerald-400/30">
@@ -230,10 +269,10 @@ export const PharmacyDashboard = ({ onOpenAuthModal }) => {
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-              {user?.name || 'Green Cross 24/7 Pharmacy'}
+              {user?.name || 'Apollo Pharmacy 24/7 Dispensary'}
             </h1>
             <p className="text-xs sm:text-sm text-teal-100/80 max-w-xl">
-              Pharmacist in-Charge: <strong>{storeSettings.pharmacistInCharge}</strong> • {user?.address || '12th Main Road, Koramangala'} (PIN: {user?.pincode || '560034'})
+              Pharmacist in-Charge: <strong>{storeSettings.pharmacistInCharge}</strong> • {user?.address || 'Door 14, Usman Road, T. Nagar, Chennai'} (PIN: {user?.pincode || '600017'})
             </p>
           </div>
 

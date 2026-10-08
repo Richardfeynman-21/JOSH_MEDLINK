@@ -14,10 +14,15 @@ import InteractivePharmacyMap from './InteractivePharmacyMap';
 import ReservationModal from './ReservationModal';
 import DeliveryModal from './DeliveryModal';
 import GenericComparisonModal from './GenericComparisonModal';
+import OcrPrescriptionScanner from './OcrPrescriptionScanner';
 import { CallPharmacyModal, DirectionsModal } from './PharmacyActionModals';
 import {
   Building2,
   ArrowUpDown,
+  Sparkles,
+  ScanLine,
+  FileText,
+  X
 } from 'lucide-react';
 
 export default function MedicineSearchMain({ initialQuery = '' } = {}) {
@@ -42,12 +47,25 @@ export default function MedicineSearchMain({ initialQuery = '' } = {}) {
     return activeMedicines[0]?.id || 'med-lipitor-20';
   });
 
+  // Bi-directional generic switch state
+  const [isSwitchedToGeneric, setIsSwitchedToGeneric] = useState(false);
+  const [originalBrandMedicine, setOriginalBrandMedicine] = useState(null);
+  const [switchedGenericMedicine, setSwitchedGenericMedicine] = useState(null);
+
   // Always compute fresh live medicine from reactive medicines state
   const liveSelectedMedicine = useMemo(() => {
     return activeMedicines.find((m) => m.id === selectedMedicineId) || activeMedicines[0];
   }, [activeMedicines, selectedMedicineId]);
 
-  const selectedMedicine = liveSelectedMedicine;
+  // Compute the current active display medicine (switched generic or live brand)
+  const displayMedicine = useMemo(() => {
+    if (isSwitchedToGeneric && switchedGenericMedicine) {
+      return switchedGenericMedicine;
+    }
+    return liveSelectedMedicine;
+  }, [isSwitchedToGeneric, switchedGenericMedicine, liveSelectedMedicine]);
+
+  const selectedMedicine = displayMedicine;
 
   useEffect(() => {
     if (initialQuery) {
@@ -60,8 +78,8 @@ export default function MedicineSearchMain({ initialQuery = '' } = {}) {
     }
   }, [initialQuery, activeMedicines]);
 
-  // Spatial & Filtering state
-  const [pincode, setPincode] = useState('560034');
+  // Spatial & Filtering state (Default to Chennai T. Nagar 600017)
+  const [pincode, setPincode] = useState('600017');
   const [radiusKm, setRadiusKm] = useState(10);
   const [quickFilters, setQuickFilters] = useState({
     inStockOnly: false,
@@ -83,6 +101,7 @@ export default function MedicineSearchMain({ initialQuery = '' } = {}) {
   const [activeReservation, setActiveReservation] = useState(null); // { pharmacy, medicine, item }
   const [activeDelivery, setActiveDelivery] = useState(null);
   const [isGenericModalOpen, setIsGenericModalOpen] = useState(false);
+  const [isPrescriptionScanModalOpen, setIsPrescriptionScanModalOpen] = useState(false);
   const [activeCallPharmacy, setActiveCallPharmacy] = useState(null);
   const [activeDirectionsPharmacy, setActiveDirectionsPharmacy] = useState(null);
 
@@ -108,17 +127,26 @@ export default function MedicineSearchMain({ initialQuery = '' } = {}) {
   };
 
   // Handle category select
+  // Handle category select
   const handleSelectCategory = (catId) => {
     setSelectedCategory(catId);
     if (catId !== 'all') {
       const match = activeMedicines.find((m) => m.category === catId);
-      if (match) setSelectedMedicineId(match.id);
+      if (match) {
+        setSelectedMedicineId(match.id);
+        setIsSwitchedToGeneric(false);
+        setOriginalBrandMedicine(null);
+        setSwitchedGenericMedicine(null);
+      }
     }
   };
 
   // Handle selecting a medicine from search suggestions
   const handleSelectMedicine = (med) => {
     setSelectedMedicineId(med.id);
+    setIsSwitchedToGeneric(false);
+    setOriginalBrandMedicine(null);
+    setSwitchedGenericMedicine(null);
     // Add to recent searches if not already there
     if (!recentSearches.includes(med.brandName)) {
       setRecentSearches([med.brandName, ...recentSearches.slice(0, 4)]);
@@ -161,14 +189,68 @@ export default function MedicineSearchMain({ initialQuery = '' } = {}) {
     return count;
   }, [radiusKm, quickFilters, rxFilter, dosageFormFilter, selectedCategory]);
 
-  // Handle switching to Generic Medicine
+  // Handle bi-directional switching to Generic Medicine
   const handleSwitchToGeneric = () => {
-    if (!selectedMedicine?.genericEquivalent) return;
+    const base = isSwitchedToGeneric ? originalBrandMedicine : liveSelectedMedicine;
+    if (!base?.genericEquivalent) return;
+
+    setOriginalBrandMedicine(base);
+    const genericEquivalent = base.genericEquivalent;
+    const savingsDiscount = (genericEquivalent.savingsPercent || 60) / 100;
+
+    const synthesizedGeneric = {
+      ...base,
+      id: `generic-${base.id}`,
+      brandName: genericEquivalent.brandName,
+      genericName: base.genericName,
+      basePrice: genericEquivalent.basePrice || Math.round(base.basePrice * (1 - savingsDiscount)),
+      savingsPercent: genericEquivalent.savingsPercent || 60,
+      manufacturer: genericEquivalent.manufacturer || 'Jan Aushadhi / Cipla Generics',
+      isGeneric: true,
+      bioequivalenceConfirmed: true,
+      dosageForm: base.dosageForm,
+      strength: base.strength,
+      // Scaled pharmacy inventory
+      pharmacyInventory: base.pharmacyInventory?.map((inv) => ({
+        ...inv,
+        price: Math.round(inv.price * (1 - savingsDiscount)),
+      })),
+    };
+
+    setSwitchedGenericMedicine(synthesizedGeneric);
+    setIsSwitchedToGeneric(true);
     setIsGenericModalOpen(false);
-    // Find or simulate generic item
-    alert(
-      `Switched to Generic: ${selectedMedicine.genericEquivalent.brandName} (${selectedMedicine.genericEquivalent.savingsPercent}% savings applied)`
+  };
+
+  // Handle switching back to Original Brand
+  const handleSwitchBackToBrand = () => {
+    setIsSwitchedToGeneric(false);
+    setSwitchedGenericMedicine(null);
+    setOriginalBrandMedicine(null);
+    setIsGenericModalOpen(false);
+  };
+
+  // Handle applying medicines detected via AI OCR Prescription Scanner
+  const handleApplyPrescriptionMedicines = (extractedMeds) => {
+    if (!extractedMeds || extractedMeds.length === 0) return;
+    const match = activeMedicines.find((m) =>
+      extractedMeds.some(
+        (em) =>
+          m.brandName.toLowerCase().includes(em.name.toLowerCase()) ||
+          m.genericName.toLowerCase().includes(em.name.toLowerCase()) ||
+          em.name.toLowerCase().includes(m.brandName.toLowerCase())
+      )
     );
+    if (match) {
+      setSelectedMedicineId(match.id);
+      setSearchQuery(match.brandName);
+      setIsSwitchedToGeneric(false);
+      setOriginalBrandMedicine(null);
+      setSwitchedGenericMedicine(null);
+    } else if (extractedMeds[0]) {
+      setSearchQuery(extractedMeds[0].name);
+    }
+    setIsPrescriptionScanModalOpen(false);
   };
 
   // Process pharmacy inventory for the selected medicine
@@ -261,8 +343,34 @@ export default function MedicineSearchMain({ initialQuery = '' } = {}) {
         </div>
       </div>
 
-      {/* 1. Multi-Mode Search Interface */}
+      {/* 1. Multi-Mode Search Interface with AI OCR Prescription Scanner Entry Point */}
       <section className="space-y-4">
+        {/* AI OCR Prescription Scanner Banner */}
+        <div className="bg-gradient-to-r from-teal-50 via-cyan-50 to-emerald-50 rounded-2xl border border-teal-200/90 p-3.5 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-xs flex-shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-xs font-bold text-teal-900 flex items-center gap-1.5">
+                <span>Prescription OCR Scanner (AI Vision)</span>
+                <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 bg-teal-600 text-white rounded">NEW</span>
+              </span>
+              <p className="text-xs text-slate-600">
+                Upload or scan any doctor's prescription. AI will read medicines &amp; check live Chennai availability.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsPrescriptionScanModalOpen(true)}
+            className="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-1.5 self-stretch sm:self-auto justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+          >
+            <ScanLine className="w-4 h-4" />
+            <span>Scan Doctor Prescription</span>
+          </button>
+        </div>
+
         <SearchModeSelector
           activeMode={activeMode}
           onSelectMode={handleSelectMode}
@@ -303,13 +411,16 @@ export default function MedicineSearchMain({ initialQuery = '' } = {}) {
         />
       </section>
 
-      {/* 3. Rich Medicine Header & Detail Card */}
+      {/* 3. Rich Medicine Header & Detail Card with Bi-directional Generic Switch */}
       {selectedMedicine && (
         <section>
           <MedicineDetailCard
             medicine={selectedMedicine}
+            isSwitchedToGeneric={isSwitchedToGeneric}
+            originalBrandMedicine={originalBrandMedicine}
             onOpenGenericModal={() => setIsGenericModalOpen(true)}
-            onSwitchToGeneric={() => setIsGenericModalOpen(true)}
+            onSwitchToGeneric={handleSwitchToGeneric}
+            onSwitchBackToBrand={handleSwitchBackToBrand}
           />
         </section>
       )}
@@ -520,12 +631,15 @@ export default function MedicineSearchMain({ initialQuery = '' } = {}) {
         inventoryItem={activeDelivery?.inventoryItem}
       />
 
-      {/* 3. Generic Comparison Modal */}
+      {/* 3. Generic Comparison Modal (Bi-directional Brand <-> Generic) */}
       <GenericComparisonModal
         isOpen={isGenericModalOpen}
         onClose={() => setIsGenericModalOpen(false)}
-        medicine={selectedMedicine}
+        medicine={isSwitchedToGeneric ? originalBrandMedicine : selectedMedicine}
+        isSwitchedToGeneric={isSwitchedToGeneric}
+        originalBrandMedicine={originalBrandMedicine}
         onSwitchConfirmed={handleSwitchToGeneric}
+        onSwitchBackToBrand={handleSwitchBackToBrand}
       />
 
       {/* 4. Call Pharmacy Modal */}
@@ -541,6 +655,47 @@ export default function MedicineSearchMain({ initialQuery = '' } = {}) {
         onClose={() => setActiveDirectionsPharmacy(null)}
         pharmacy={activeDirectionsPharmacy}
       />
+
+      {/* 6. AI Prescription OCR Scanner Standalone Modal */}
+      {isPrescriptionScanModalOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-md animate-fadeIn"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="ocr-standalone-title"
+        >
+          <div className="relative w-full max-w-2xl bg-white rounded-3xl border border-slate-200 shadow-2xl p-5 sm:p-6 max-h-[90vh] overflow-y-auto space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                  <ScanLine className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 id="ocr-standalone-title" className="text-base font-bold text-slate-900">
+                    AI Prescription OCR Reader &amp; Drug Matcher
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Auto-detects medications from hospital prescriptions &amp; locates Chennai stock
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsPrescriptionScanModalOpen(false)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                aria-label="Close Prescription Scanner"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <OcrPrescriptionScanner
+              onScanComplete={() => {}}
+              onApplyMedicines={handleApplyPrescriptionMedicines}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
