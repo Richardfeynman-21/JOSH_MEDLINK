@@ -1,24 +1,27 @@
-# 🏥 MedLink: Intelligent Real-Time Medicine Availability, Pharmacy Coordination, and Emergency Drug Access System
+# 🏥 MedLink Chennai: Intelligent Real-Time Medicine Availability & Spatial Pharmacy Coordination System
 
 [![React 19](https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![React Router 7](https://img.shields.io/badge/React_Router-7.1-CA4245?style=for-the-badge&logo=react-router&logoColor=white)](https://reactrouter.com/)
 [![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.3-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Design System](https://img.shields.io/badge/Stitch_MCP-Clinical_Clarity-0D9488?style=for-the-badge&logo=material-design&logoColor=white)](https://stitch.withgoogle.com/)
-[![HIPAA UI Standard](https://img.shields.io/badge/Security-HIPAA_256--Bit_Ready-10B981?style=for-the-badge&logo=shield&logoColor=white)](https://www.hhs.gov/hipaa)
+[![CDSCO Compliance](https://img.shields.io/badge/Compliance-CDSCO_%26_TN_DCA-0D9488?style=for-the-badge&logo=shield&logoColor=white)](https://cdsco.gov.in/)
+[![ABDM Ready](https://img.shields.io/badge/Standard-ABDM_Digital_Health-10B981?style=for-the-badge&logo=heart&logoColor=white)](https://abdm.gov.in/)
 
-> **MedLink** is a centralized healthcare platform that connects patients, pharmacies, and regulatory healthcare administrators in real time. It eliminates the frustration and delays of visiting multiple stores or making dozens of phone calls during medical emergencies by providing live stock visibility, digital 2-hour shelf-hold reservations, pharmacy inventory management, and supreme administrative oversight.
+> **MedLink Chennai** is an enterprise-grade multipage healthcare platform connecting patients, licensed pharmacies, and CDSCO regulatory authorities across Chennai in real time. It eliminates acute shortages and fragmented phone inquiries during medical emergencies by providing live dispensary stock visibility, optical prescription OCR scanning, digital 2-hour shelf-hold reservations, and bio-equivalent generic cost-saving switches.
 
 ---
 
 ## 🌟 Table of Contents
 - [Executive Overview](#-executive-overview)
-- [Three Dedicated Portal Roles & Logins](#-three-dedicated-portal-roles--logins)
-  - [1. Patient Portal](#1-patient-portal)
-  - [2. Pharmacy Partner Portal](#2-pharmacy-partner-portal)
-  - [3. Regulatory & Healthcare Admin Portal](#3-regulatory--healthcare-admin-portal)
-- [Flagship Main Landing Page](#-flagship-main-landing-page)
-- [Real-Time Medicine Search & Emergency Access ⭐](#-real-time-medicine-search--emergency-access-)
-- [Real-Time Cross-Portal State Coordination](#-real-time-cross-portal-state-coordination)
+- [Key Features & Innovations](#-key-features--innovations)
+- [Multipage Application Architecture](#-multipage-application-architecture)
+- [Three Dedicated Portals & Role Access](#-three-dedicated-portals--role-access)
+  - [1. Patient Portal (`/patient`)](#1-patient-portal-patient)
+  - [2. Pharmacy Partner Portal (`/pharmacy`)](#2-pharmacy-partner-portal-pharmacy)
+  - [3. CDSCO & State Regulatory Admin Portal (`/admin`)](#3-cdsco--state-regulatory-admin-portal-admin)
+- [Centralized Authentication & Registration (`/auth`)](#-centralized-authentication--registration-auth)
+- [Optical AI Rx Scanner (`/ocr-scanner`)](#-optical-ai-rx-scanner-ocr-scanner)
+- [24/7 Trauma SOS Protocol (`/emergency`)](#-247-trauma-sos-protocol-emergency)
 - [Design System: Clinical Clarity](#-design-system-clinical-clarity)
 - [Project Directory Structure](#-project-directory-structure)
 - [Getting Started](#-getting-started)
@@ -28,183 +31,148 @@
 
 ## 🚀 Executive Overview
 
-Finding critical medications during acute illnesses or emergencies is often plagued by inventory fragmentation, lack of real-time visibility, and manual phone inquiries. **MedLink** resolves this crisis through a tripartite architecture:
-1. **Patients** find verified medicines, place 2-hour shelf-holds, manage digital emergency passports, and dispatch 1-click refills.
-2. **Pharmacies** digitally manage their live drug formularies, process incoming patient reservations, and allocate emergency/ICU supplies.
-3. **Administrators** possess complete oversight: reviewing and approving pharmacy drug licenses, monitoring all patient health records, inspecting global stock telemetry, and governing master drug pricing.
+Finding critical medications during acute illnesses or trauma emergencies in metropolitan areas like Chennai is frequently hindered by inventory fragmentation and manual phone calls. **MedLink Chennai** addresses this crisis through a multipage, real-time architecture:
+1. **Patients** search real-time medicine availability within a customizable kilometer radius, upload physical prescriptions for automatic OCR parsing, reserve drugs on a guaranteed 2-hour shelf-hold, and carry encrypted digital medical IDs.
+2. **Pharmacies** digitize their live inventory ERP, process shelf-hold reservations before stockouts occur, manage 30-minute courier dispatches, and allocate trauma/ICU reserves.
+3. **CDSCO & State Drug Controllers** exercise Level-5 oversight: inspecting pharmacy licensing dossiers, monitoring patient health safety, governing formulary pricing ceilings, and auditing cryptographic compliance logs.
 
 ---
 
-## 🔐 Three Dedicated Portal Roles & Logins
+## ⚡ Key Features & Innovations
 
-### 1. Patient Portal
-Located in `src/components/patient/`:
-- **Clinical Intake (`PatientRegister.jsx`)**: 4-step onboarding with demographic data, 8-card Blood Group selector ($O^-$ Universal Donor, $AB^+$ Universal Recipient), severe allergy chips (Penicillin, Sulfa, NSAIDs, Latex), 24/7 ICE contacts, PIN code geo-linking, and HIPAA consent.
-- **Patient Sign In (`PatientLogin.jsx`)**: MedLink ID (`#ML-XXXXXX`) or Email authentication + workstation persistence.
-- **Identity Recovery (`ForgotPassword.jsx`)**: 6-slot interactive OTP cells with auto-advance, backspace handling, clipboard paste, 60s countdown timer, and live password strength meter.
-- **Active Dashboard (`PatientDashboard.jsx`)**:
-  - **Digital Emergency Medical ID Card (`DigitalMedicalIdCard.jsx`)**: Scannable encrypted triage QR code, blood group badge, critical allergy warning chips, and 24/7 ICE quick-dial.
-  - **Editable Personal Details (`EditablePersonalDetails.jsx`)**: Live inline profile editor.
-  - **Medical Summary (`MedicalSummary.jsx`)**: Primary physician details with direct call.
-  - **Preferred Pharmacies (`PreferredPharmaciesList.jsx`)**: Matched pharmacies by PIN with 24/7 and drive-thru tags.
-  - **Prescription & Refill History (`PrescriptionRefillHistory.jsx`)**: Active medications with **One-Click Refill Dispatch** that triggers real-time courier tracking.
-
-### 2. Pharmacy Partner Portal
-Located in `src/components/pharmacy/`:
-- **Pharmacy Partner Registration (`PharmacyRegister.jsx`)**: Onboarding dossier intake including Store Name, State Drug License # (e.g. `DL-CA-99214`), Pharmacist in-Charge Name, Phone, Email, Address, PIN code, 24/7 operating toggle, drive-thru toggle, and cold-chain certification. Submissions are queued under `PENDING_APPROVAL` for admin review.
-- **Pharmacy Sign In (`PharmacyLogin.jsx`)**: Drug License # or Email login with workstation persistence. Includes **One-Click Demo Pharmacy Login** (*Green Cross 24/7 Pharmacy*).
-- **Pharmacy Dashboard (`PharmacyDashboard.jsx`)**:
-  - **Live Inventory Manager**: Real-time stock counts, batch numbers, expiry dates, unit prices, Rx-only toggle, inline quantity adjustments (`+1`, `-1`, `+10`), and **"RESERVED FOR EMERGENCY / ICU ONLY"** designation. Includes modal to add new drugs.
-  - **Live 2-Hour Shelf-Hold Queue**: Real-time queue displaying incoming patient reservations with token (e.g. `MED-RES-8849-2H`), patient name, medication, quantity, live countdown timer, and **"Mark Dispensed / Complete"** or **"Cancel & Restock"** actions.
-  - **Courier Delivery Orders Queue**: Incoming 30-min express courier delivery orders with cold-chain packaging assurance and dispatch button.
-  - **Store Profile Settings**: 24/7 toggle, drive-thru toggle, and emergency stock threshold alerts.
-
-### 3. Regulatory & Healthcare Admin Portal
-Located in `src/components/admin/`:
-- **Admin Sign In (`AdminLogin.jsx`)**: Level-5 Security Key authentication. Includes **One-Click Demo Admin Login** (*Chief Regulatory Officer Dr. Christopher Cole*).
-- **Supreme Admin Dashboard (`AdminDashboard.jsx`)**:
-  - **Tab 1: Pharmacy Licensing & Approvals**: Inspect pending pharmacy partner dossiers, verify Drug License # and tax ID, and execute **"Approve Pharmacy"** (instantly activates the pharmacy platform-wide) or **"Reject"**.
-  - **Tab 2: Complete Patient Management**: Search and inspect all registered patients, MedLink IDs, emergency blood types, severe allergies, and active prescriptions with account status toggles (*Active / Suspended / Flagged*).
-  - **Tab 3: Complete Pharmacy Oversight**: Global telemetry across all approved pharmacies, stockout warnings, live inventory counts, and audit status toggles (*Active / Audit Hold*).
-  - **Tab 4: Master Formulary Catalog**: Manage central drugs, assign generic bio-equivalent mappings, standard pricing ceilings, and emergency drug tags.
-  - **Tab 5: Platform Telemetry & Audit Logs**: Real-time live event stream of logins, stock edits, approvals, and emergency drug requests.
+- **Multipage Navigation with Code Splitting**: Built with `react-router-dom` and React Suspense lazy-loaded routes for sub-second page transitions.
+- **Dedicated Home-Only Top Navbar**: The full floating Antigravity navbar appears strictly on the home page (`/`) with a single, elegant "Login" button and demo switcher. All secondary pages feature a lightweight, breadcrumbed `PageHeader` with direct home navigation.
+- **Optical AI Prescription Scanner**: Live canvas drag-and-drop / upload of physical prescriptions, synthetic OCR text extraction, confidence scoring, dosage recommendations, and 1-click cart insertion.
+- **Bi-Directional Generic Switcher**: Visual molecular equivalency analysis comparing expensive branded drugs with affordable generic equivalents, showing verified rupee savings (₹).
+- **2-Hour Shelf-Hold Guarantee**: Instant tokenized reservation (`MED-RES-XXXX-2H`) with live countdown timers synchronized across patient and pharmacy screens.
+- **Chennai Localization & Metric System**: Real landmarks (T. Nagar, Greams Road, Alwarpet, Anna Nagar, Kilpauk, Adyar), metric distances in kilometers (`km`), Indian phone numbers (+91), Apollo & Kauvery hospitals, and Tamil Nadu 108 Emergency Medical Services.
+- **Persistent & Secure Authentication**: Clean unauthenticated default state on fresh launches, role-gated portals, demo accounts, and optional workstation persistence.
 
 ---
 
-## 🌟 Flagship Main Landing Page
+## 🗺️ Multipage Application Architecture
 
-Located in `src/components/landing/`:
-- **Hero Section (`LandingHero.jsx`)**: Impactful headline, 24/7 Emergency Drug Access live ticker, and embedded quick search teaser with instant medicine pills (*Augmentin, Ventolin, Lipitor, Januvia, Lantus, EpiPen*).
-- **Three Role Portal Gateways (`RolePortalCards.jsx`)**: Three high-end cards directing visitors to the Patient Portal, Pharmacy Partner Portal, and Regulatory Admin Portal with clear CTAs.
-- **Live Metric Counters (`PlatformStats.jsx`)**: 480+ Partner Pharmacies, 14,250+ Indexed Medicines, 28,400+ 2h Shelf-Holds Fulfilled, 24-minute average emergency delivery.
-- **Core Value Pillars (`FeatureShowcase.jsx`)**: Interactive showcases of real-time ERP inventory sync, 2-hour reservation token guarantee, emergency fast-track, and smart generic bio-equivalence switcher with interactive dosage savings slider.
-- **4-Step How It Works (`HowItWorks.jsx`)**: Interactive visual journey: Search -> Locate -> Hold 2h / Deliver -> Receive.
-- **Trust & Security Banner (`TrustSecurityBanner.jsx`)**: HIPAA 256-bit encryption, verified licensure, and 24/7 Hotline (`1-800-MED-LINK`).
-- **Medical Footer (`LandingFooter.jsx`)**: Full directory, emergency disclaimers, and regulatory disclosures.
-
----
-
-## 💊 Real-Time Medicine Search & Emergency Access ⭐
-
-Located in `src/components/search/`:
-- **Multi-Mode Search (`SearchModeSelector.jsx`)**: Search by Brand Name, Generic Composition, Medicine ID / NDC / Batch, or Category pills.
-- **Predictive Autocomplete (`PredictiveSearchBar.jsx`)**: Real-time suggestions with stock indicators and recent search history chips.
-- **Spatial Filters (`SearchFiltersBar.jsx`)**: Radius slider (2 km, 5 km, 10 km, 25 km) matching patient PIN code, 24/7 open toggle, in-stock toggle, and dosage form chips.
-- **Clinical Medicine Detail Card (`MedicineDetailCard.jsx`)**: Cold-chain alert banner (2°C–8°C digital logger assurance) and generic switch callout.
-- **Real-Time Pharmacy Stock Cards (`PharmacyStockCard.jsx`)**: Live stock status badges (`IN STOCK`, `LOW STOCK`, `RESERVED FOR EMERGENCY / ICU`, `OUT OF STOCK`), ERP sync timestamps, price comparisons, and 4 instant action buttons (Hold & Reserve, Request Delivery, Directions, Call Pharmacy).
-- **Interactive Spatial Pharmacy Map (`InteractivePharmacyMap.jsx`)**: Color-coded stock pins, concentric distance rings, tooltip preview cards, and List / Split / Map view switcher.
-- **Action Modals**: 2-Hour Reservation Modal with countdown timer (`ReservationModal.jsx`), 30-min Courier Delivery Modal (`DeliveryModal.jsx`), and Generic Bio-Equivalence Comparison Modal (`GenericComparisonModal.jsx`).
+| Route | Page Component | Description |
+| :--- | :--- | :--- |
+| `/` | `HomePage.jsx` | Flagship landing page, value pillars, savings calculator, and quick search pills |
+| `/search` | `SearchPage.jsx` | Real-time multi-mode drug search, stock status badges, and interactive map |
+| `/medicine/:id` | `MedicineDetailPage.jsx` | Clinical drug monograph, cold-chain assurance, and generic bio-equivalent switch |
+| `/ocr-scanner` | `PrescriptionScanPage.jsx` | Optical AI Rx document scanner and automated medicine mapper |
+| `/emergency` | `EmergencyProtocolPage.jsx` | 24/7 Tamil Nadu 108 trauma protocol, antivenom & ICU antidote availability |
+| `/patient` | `PatientPortalPage.jsx` | Digital Medical ID card, O- donor verification, active prescriptions & refills |
+| `/pharmacy` | `PharmacyPortalPage.jsx` | Licensed dispensary ERP, stock management, and live 2-hour hold queue |
+| `/admin` | `AdminPortalPage.jsx` | Level-5 CDSCO drug regulatory console, licensing reviews, and audit telemetry |
+| `/auth` | `AuthPage.jsx` | Unified authentication, registration, password setup, and OTP recovery |
+| `*` | `NotFoundPage.jsx` | 404 clinical recovery page with direct home routing |
 
 ---
 
-## ⚡ Real-Time Cross-Portal State Coordination
+## 🔐 Three Dedicated Portals & Role Access
 
-The application implements a centralized reactive state layer in `src/context/AuthContext.jsx`:
-```
-                                 [ AuthContext.jsx ]
-                                          │
-       ┌──────────────────────────────────┼──────────────────────────────────┐
-       ▼                                  ▼                                  ▼
-[ Pharmacy Portal ]             [ Medicine Search ⭐ ]              [ Admin Portal ]
-When a pharmacy updates         Stock counts update                Telemetry counts update
-stock count or marks ICU        instantly in search results        immediately in global
-reserve in inventory...         without page refresh!              pharmacy oversight!
-       │                                  ▲                                  ▲
-       ▼                                  │                                  │
-[ Patient reserves drug ] ───► Deducts stock count ──────────────► Appears in Pharmacy
-in Medicine Search...          & generates 2h token                Shelf-Hold Queue!
-       │                                                                     │
-       ▼                                                                     ▼
-[ Admin approves pharmacy ] ─────────────────────────────────────► Pharmacy goes live
-in Licensing tab...                                                across network!
-```
+### 1. Patient Portal (`/patient`)
+- **Digital Emergency Medical ID Card**: Scannable encrypted triage QR code, blood group badge ($O^-$ Universal Donor), documented severe drug allergies (Penicillin, Sulfa, NSAIDs), and 24/7 ICE emergency contacts.
+- **Verified Prescriptions & Refills**: Real-time prescription history with **1-Click Refill Dispatch** triggering live courier tracking.
+- **Matched Local Dispensaries**: Nearest Chennai pharmacies filtered by distance (`km`), 24/7 operation, and drive-thru facilities.
+- **Emergency Simulation**: One-click first-responder triage mode testing offline medical badge accessibility.
+
+### 2. Pharmacy Partner Portal (`/pharmacy`)
+- **Live Inventory ERP**: Batch numbers, expiry dates, unit retail prices (₹), cold-chain toggles, and inline stock adjustments (`+1`, `-1`, `+10`).
+- **2-Hour Shelf-Hold Queue**: Real-time queue displaying patient reservation tokens, medication names, quantities, and live countdown timers with "Mark Dispensed" or "Cancel & Restock" actions.
+- **Emergency / ICU Allocation**: Dedicated toggle to reserve critical drug quotas for hospital trauma centers.
+- **Express Courier Dispatches**: 30-minute delivery dispatch queue with temperature-controlled packaging verification.
+
+### 3. CDSCO & State Regulatory Admin Portal (`/admin`)
+- **Pharmacy Licensing & Approvals**: Review pending pharmacy accreditation dossiers, inspect GST/license numbers, and execute one-click regulatory approval or rejection.
+- **Statewide Patient Safety Oversight**: Search registered patients, verify emergency blood types, and monitor severe allergy warnings.
+- **Dispensary Network Telemetry**: Live inventory counts across all Chennai hubs, stockout warnings, and compliance audit locks.
+- **Master Formulary Catalog**: Price ceiling controls, generic composition links, and schedule H1 narcotics tracking.
+- **Cryptographic Audit Logs**: Exportable JSON telemetry recording every sign-in, stock modification, and regulatory action.
+
+---
+
+## 🔑 Centralized Authentication & Registration (`/auth`)
+
+- **Role Selection**: Toggle between Patient, Licensed Pharmacy, and CDSCO Regulatory Administrator.
+- **Password Security**: Explicit password configuration during registration, live strength meters, and show/hide toggles.
+- **Forgot Password Flow**: Interactive 6-slot OTP cells with auto-focus, paste support, 60-second cooldown timer, and password reset.
+- **Device Persistence**: "Remember this workstation / device" checkbox governing session persistence.
+
+---
+
+## 📸 Optical AI Rx Scanner (`/ocr-scanner`)
+
+- **Multimodal Document Upload**: Drag and drop prescription files (PNG, JPG, PDF) or select sample test prescriptions.
+- **AI Text Extraction**: Optical simulation scanning physician handwriting, extracting active ingredients, strengths, and dosage instructions.
+- **Instant Formulary Match**: Maps extracted entities directly to networked Chennai pharmacies with live stock counts and 1-click cart addition.
+
+---
+
+## 🚨 24/7 Trauma SOS Protocol (`/emergency`)
+
+- **Tamil Nadu 108 Emergency Integration**: Direct dispatch links for ambulance paramedics and emergency room physicians.
+- **Critical Antidote Ticker**: Real-time availability for Snake Antivenom, Atropine, Naloxone, Tenecteplase, and Prothrombin Complex.
+- **Hospital Trauma Direct**: Quick-dial hotlines for Apollo Hospitals Greams Road, Kauvery Hospital Alwarpet, and MIOT Hospitals.
 
 ---
 
 ## 🎨 Design System: Clinical Clarity
 
-Generated via **Google Stitch MCP**, the **Clinical Clarity** design system balances institutional authority with compassionate, high-legibility healthcare UX.
+Crafted with high-legibility healthcare UX principles, spatial depth, and glassmorphism:
 
 | Design Token | Value | Clinical Purpose |
 | :--- | :--- | :--- |
-| **Primary Clinical Teal** | `#0D9488` / `#0F766E` | Institutional authority, security, verified status |
-| **Secondary Vibrant Teal**| `#14B8A6` | Focus halos, active tabs, live inventory indicators |
-| **Emergency Crimson** | `#E11D48` / `#FFF1F2` | Blood donor tags, severe allergies, ICU emergency reserves |
-| **Canvas Background** | `#F8FAFC` | Calm, non-glare clinical backdrop |
-| **Card Surfaces** | `#FFFFFF` | Sterile, clean information modules |
-| **Borders & Dividers** | `#E2E8F0` / `#CBD5E1` | Feather-light micro-borders replacing heavy shadows |
-| **Headings Font** | **Plus Jakarta Sans** | Modern geometric grotesk conveying institutional trust |
-| **Tabular & Badge Font** | **Inter (tnum)** | High-precision tabular figures for doses, stock, and batch IDs |
+| **Primary Clinical Teal** | `#0D9488` / `#0F766E` | Institutional authority, verified dispensary status |
+| **Emergency Crimson / Rose**| `#E11D48` / `#BE123C` | Universal blood donor badges, critical allergies, ICU reserves |
+| **Canvas Backdrop** | `#F8FAFC` | Non-glare clinical surface minimizing ocular fatigue |
+| **Glassmorphism Panels** | `bg-white/85 backdrop-blur-xl` | Floating Antigravity spatial cards with subtle borders |
+| **Typography** | **Plus Jakarta Sans** (Headings) + **Inter** (Tabular figures `tnum`) | Maximum numerical clarity for dosages, batch codes, and prices |
+| **Favicon** | **MedLink Medical Heart** (`favicon.svg`, `favicon.ico`) | High-contrast heart with ECG pulse wave in browser tabs |
 
 ---
 
 ## 📁 Project Directory Structure
 
 ```
-JOSH_MEDLINK/
-├── index.html                           # Google Fonts & viewport configuration
-├── vite.config.js                       # Vite 8 + Tailwind CSS v4 setup
-├── package.json                         # Dependencies and build scripts
-├── README.md                            # Comprehensive documentation & architecture
+JOSH_WEB_PROTOTYPE/
+├── index.html                           # Entry HTML with MedLink heart favicon & fonts
+├── vite.config.js                       # Vite 8 + Tailwind CSS v4 + chunking configuration
+├── package.json                         # Dependencies & npm scripts
+├── README.md                            # Comprehensive platform documentation
+├── public/
+│   ├── favicon.svg                      # Custom vector medical heart tab icon
+│   └── favicon.ico                      # Multi-resolution (16/32/48/64) tab icon
 ├── src/
-│   ├── main.jsx                         # Application entry point
-│   ├── App.jsx                          # Master layout, 3-role routing & emergency banner
-│   ├── index.css                        # Tailwind v4 imports & clinical root variables
+│   ├── main.jsx                         # Application root mount
+│   ├── index.css                        # Tailwind v4 directives & root variables
 │   ├── context/
-│   │   └── AuthContext.jsx              # Unified 3-role auth, live inventory & reservation state
-│   ├── data/
-│   │   ├── mockMedicines.js             # Formularies, generic equivalents & pharmacy stock
-│   │   ├── mockPatientData.js           # Blood catalogs, allergies & demo patient Sarah Jenkins
-│   │   └── mockPharmacyAdminData.js     # Pending/approved pharmacies, reservations & audit logs
-│   └── components/
-│       ├── common/                      # Shared layout & feedback components
-│       │   ├── Navbar.jsx               # Top navigation bar with portal switcher & user pill
-│       │   ├── Footer.jsx               # Medical footer & regulatory links
-│       │   ├── EmergencyBanner.jsx      # 24/7 Universal O-Negative Fast-Track banner
-│       │   ├── ToastContainer.jsx       # Floating clinical alert notifications
-│       │   └── index.js
-│       ├── landing/                     # Flagship main landing page
-│       │   ├── LandingPage.jsx          # Master landing container
-│       │   ├── LandingHero.jsx          # Hero headline, emergency ticker & search teaser
-│       │   ├── RolePortalCards.jsx      # 3 portal gateways (Patient, Pharmacy, Admin)
-│       │   ├── PlatformStats.jsx        # Live metrics counter grid
-│       │   ├── FeatureShowcase.jsx      # Value pillars & interactive savings calculator
-│       │   ├── HowItWorks.jsx           # 4-step interactive patient journey
-│       │   ├── TrustSecurityBanner.jsx  # HIPAA 256-bit encryption & hotline banner
-│       │   ├── LandingFooter.jsx        # Dedicated landing footer
-│       │   └── index.js
-│       ├── patient/                     # Patient portal components
-│       │   ├── PatientLogin.jsx         # Email/MedLink ID sign in + Demo Patient button
-│       │   ├── PatientRegister.jsx      # 4-step clinical intake & HIPAA authorization
-│       │   ├── ForgotPassword.jsx       # 6-slot OTP cells with 60s countdown & strength meter
-│       │   ├── PatientDashboard.jsx     # Master patient profile dashboard
-│       │   ├── DigitalMedicalIdCard.jsx # Encrypted emergency QR code, O- donor & ICE dial
-│       │   ├── EditablePersonalDetails.jsx # In-line profile & address editor
-│       │   ├── MedicalSummary.jsx       # Primary doctor & chronic condition chips
-│       │   ├── PreferredPharmaciesList.jsx # Matched pharmacies by PIN with 24/7 badges
-│       │   ├── PrescriptionRefillHistory.jsx # 1-Click Refill order dispatch with live status
-│       │   └── index.js
-│       ├── pharmacy/                    # Pharmacy partner portal components
-│       │   ├── PharmacyLogin.jsx        # Drug License #/Email login + Demo Pharmacy button
-│       │   ├── PharmacyRegister.jsx     # Partner onboarding intake (DL cert, 24/7, drive-thru)
-│       │   ├── PharmacyDashboard.jsx    # Real-time stock manager, 2-hr shelf holds, deliveries
-│       │   └── index.js
-│       ├── admin/                       # Regulatory admin portal components
-│       │   ├── AdminLogin.jsx           # Level-5 admin email + security key + Demo Admin button
-│       │   ├── AdminDashboard.jsx       # 5 supreme control tabs (licensing, patients, stations, formulary, audit)
-│       │   └── index.js
-│       └── search/                      # Real-time medicine search components
-│           ├── MedicineSearchMain.jsx   # Master search container orchestrating filters & views
-│           ├── SearchModeSelector.jsx   # Brand, Generic, ID/NDC & Category selector
-│           ├── PredictiveSearchBar.jsx  # Autocomplete search with recent query history
-│           ├── SearchFiltersBar.jsx     # Radius slider (2-25km), 24/7 & stock toggles
-│           ├── MedicineDetailCard.jsx   # Clinical drug specs, cold-chain alert & generic switch
-│           ├── PharmacyStockCard.jsx    # Live stock badges, ERP sync time & 4 instant actions
-│           ├── InteractivePharmacyMap.jsx # Interactive visual map with concentric distance rings
-│           ├── ReservationModal.jsx     # 2-hour hold reservation & countdown timer
-│           ├── DeliveryModal.jsx        # 30-min cold-chain express delivery dispatch
-│           ├── GenericComparisonModal.jsx # Bioequivalence analysis & savings calculator
-│           └── PharmacyActionModals.jsx # Direct phone dial & turn-by-turn route navigation
+│   │   └── AuthContext.jsx              # Centralized reactive auth & live inventory state
+│   ├── layouts/
+│   │   └── RootLayout.jsx               # Multipage layout (Home-only navbar, emergency banner, outlet)
+│   ├── routes/
+│   │   └── AppRoutes.jsx                # Code-split routing table with React Suspense
+│   ├── pages/
+│   │   ├── HomePage.jsx                 # Landing page
+│   │   ├── SearchPage.jsx               # Medicine search & interactive map
+│   │   ├── MedicineDetailPage.jsx       # Drug monograph & generic switch
+│   │   ├── PrescriptionScanPage.jsx     # Optical AI Rx scanner
+│   │   ├── EmergencyProtocolPage.jsx    # 24/7 Trauma SOS & 108 protocol
+│   │   ├── PatientPortalPage.jsx        # Patient health dashboard
+│   │   ├── PharmacyPortalPage.jsx       # Pharmacy dispensary ERP
+│   │   ├── AdminPortalPage.jsx          # CDSCO regulatory authority
+│   │   ├── AuthPage.jsx                 # Login, register & password recovery
+│   │   └── NotFoundPage.jsx             # 404 clinical error recovery
+│   ├── components/
+│   │   ├── common/                      # Navbar (home-only), PageHeader, Footer, Toast
+│   │   ├── landing/                     # Hero, features, stats, workflow
+│   │   ├── search/                      # Real-time search bars, maps, modals
+│   │   ├── patient/                     # Medical ID card, demographics, refill history
+│   │   ├── pharmacy/                    # Inventory table, reservation queue, settings
+│   │   ├── admin/                       # Licensing queue, patient records, audit logs
+│   │   └── auth/                        # Role forms, password meters, OTP cells
+│   └── data/
+│       ├── mockMedicines.js             # Formularies, generic bio-equivalents & live stock
+│       ├── mockPatientData.js           # Demo patient (Kavitha Sundaram • O-) & clinics
+│       └── mockPharmacyAdminData.js     # Demo pharmacy (Apollo 24/7) & Admin (Dr. Sundararajan)
 ```
 
 ---
@@ -212,20 +180,23 @@ JOSH_MEDLINK/
 ## ⚡ Getting Started
 
 ### Prerequisites
-- Node.js `v20+` or `v22+` (Tested on `v26.1.0`)
-- npm `v10+` or `v11+`
+- Node.js `v20+` or `v22+`
+- npm `v10+`
 
 ### Installation & Run
 ```bash
-# Clone the repository
+# 1. Clone repository
 git clone https://github.com/Richardfeynman-21/JOSH_MEDLINK.git
 cd JOSH_MEDLINK
 
-# Install dependencies
+# 2. Install dependencies
 npm install
 
-# Start development server
+# 3. Start development server
 npm run dev
+
+# 4. Create production build
+npm run build
 ```
 
 Open `http://localhost:5173` in your browser.
@@ -234,26 +205,23 @@ Open `http://localhost:5173` in your browser.
 
 ## 🧭 Interactive Evaluation Guide
 
-Use the top navigation bar or the **Demo Switcher** to test all roles:
+Use the **Demo Switcher** on the top navbar or page headers to test all roles immediately:
 
-1. **Main Landing Page**: Explore the flagship landing page with live ticker, embedded search pills, 3 portal cards, interactive generic savings slider, and 4-step walkthrough.
-2. **Role 1: Patient**: Click **"Demo Patient: Sarah Jenkins"**:
-   - Inspect the **Digital Emergency Medical ID Card** ($O^-$ blood group, severe allergies, ICE quick-dial).
+1. **Home Page (`/`)**: Inspect the redesigned top navbar with a single "Login" button and quick links to search, scanner, and trauma SOS.
+2. **Demo Patient**: Click **"Demo Patient (Kavitha)"**:
+   - Navigate to `/patient` to inspect the **Digital Medical ID Card** ($O^-$ Universal Donor, allergies, ICE contacts).
    - Test **1-Click Refill Dispatch** on active prescriptions.
-   - Switch to **"Medicine Search ⭐"** to test Brand, Generic, ID search, and reserve medication with a 2-hour shelf hold.
-3. **Role 2: Pharmacy**: Click **"Demo Pharmacy: Green Cross 24/7"**:
-   - **Live Stock Update**: Edit any medicine's stock units (e.g. Lipitor from 142 to 143, or mark ICU Reserve).
-   - **Check Search Reactivity**: Switch to "Medicine Search ⭐" and observe that the stock count updated in real time!
-   - **2-Hour Shelf-Hold Queue**: View incoming patient reservations, inspect countdown timers, and click "Mark Dispensed / Complete".
-4. **Role 3: Admin**: Click **"Demo Admin: Dr. Christopher Cole"**:
-   - **Pharmacy Licensing Tab**: Review pending pharmacy registrations and click **"Approve Pharmacy"** to instantly activate them on the network.
-   - **Patient Management Tab**: Inspect all registered patients, view medical IDs, and toggle account statuses.
-   - **Pharmacy Oversight Tab**: Inspect live inventory telemetry across all stores and stockout alerts.
-   - **Master Formulary Tab**: Manage central medicine pricing ceilings and emergency drug tags.
-   - **Audit Logs Tab**: Inspect the live activity feed of logins, stock updates, and approvals.
+   - Go to `/ocr-scanner` and test scanning a prescription to auto-populate medicines.
+3. **Demo Pharmacy**: Click **"Demo Pharmacy (Apollo)"**:
+   - Navigate to `/pharmacy` to adjust stock counts (e.g. Paracetamol or Augmentin).
+   - Switch to `/search` and observe that the stock count updated in real time across the network without a page refresh!
+   - Process incoming 2-hour hold reservations with the countdown timer.
+4. **Demo Admin**: Click **"Demo Admin (Dr. R. Sundararajan)"**:
+   - Navigate to `/admin` to review pending pharmacy licenses and click **"Approve Pharmacy"**.
+   - Inspect statewide patient safety records, formulary price ceilings, and cryptographic audit logs.
 
 ---
 
 ## 📄 License
-Developed for the **MedLink** Healthcare Platform initiative.  
+Developed for the **MedLink Healthcare Platform** initiative.  
 All rights reserved.
